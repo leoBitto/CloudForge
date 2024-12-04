@@ -1,0 +1,7 @@
+Django==5.0
+django-pwa==1.1.0
+fontawesomefree==6.4.2
+gunicorn==21.2.0
+Pillow==10.1.0
+psycopg2-binary==2.9.9
+

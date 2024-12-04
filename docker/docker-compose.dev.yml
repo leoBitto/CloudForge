@@ -1,0 +1,67 @@
+services:
+  django_service:
+    build:
+      context: ../
+      dockerfile: ./docker/django/Dockerfile
+    image: django_service
+    restart: always
+    command: gunicorn base.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120
+    volumes:
+      - static_volume:/home/app/web/static
+      - media_volume:/home/app/web/media
+    expose:
+      - 8000
+    env_file:
+      - ../config/django.conf
+    depends_on:
+      db_silver:
+        condition: service_healthy
+      db_gold:
+        condition: service_healthy
+    networks:
+      app_network:
+        ipv4_address: 192.168.100.2
+
+  db_silver:
+    image: postgres:15
+    volumes:
+      - postgres_data_silver:/var/lib/postgresql/data/
+    env_file:
+      - ../config/silver.conf
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      app_network:
+        ipv4_address: 192.168.100.3
+
+  db_gold:
+    image: postgres:15
+    volumes:
+      - postgres_data_gold:/var/lib/postgresql/data/
+    env_file:
+      - ../config/gold.conf
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      app_network:
+        ipv4_address: 192.168.100.4
+
+volumes:
+  postgres_data_silver:
+  postgres_data_gold:
+  static_volume:
+  media_volume:
+
+
+networks:
+  app_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24
