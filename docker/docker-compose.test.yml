@@ -1,0 +1,173 @@
+services:
+  django_service:
+    build:
+      context: ../
+      dockerfile: ./docker/django/Dockerfile
+    image: django_service
+    restart: always
+    command: gunicorn base.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120
+    volumes:
+      - static_volume:/home/app/web/static
+      - media_volume:/home/app/web/media
+    expose:
+      - 8000
+    env_file:
+      - ../config/django.conf
+    depends_on:
+      db_silver:
+        condition: service_healthy
+      db_gold:
+        condition: service_healthy
+    networks:
+      app_network:
+        ipv4_address: 192.168.100.2
+
+  db_silver:
+    image: postgres:15
+    volumes:
+      - postgres_data_silver:/var/lib/postgresql/data/
+    env_file:
+      - ../config/silver.conf
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      app_network:
+        ipv4_address: 192.168.100.3
+
+  db_gold:
+    image: postgres:15
+    volumes:
+      - postgres_data_gold:/var/lib/postgresql/data/
+    env_file:
+      - ../config/gold.conf
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      app_network:
+        ipv4_address: 192.168.100.4
+
+  airflow-metadata:
+    image: postgres:latest
+    networks:
+      - app_network
+    env_file:
+      - ../config/airflow-metadata.conf
+
+  init-airflow:
+    image: apache/airflow:latest
+    depends_on:
+      - airflow-metadata
+    networks:
+      - app_network
+    env_file:
+      - ../config/airflow.conf
+    environment:
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}
+    command: >
+      bash -c "airflow db migrate &&
+                airflow users create \\
+                 --username ${ADMIN_USERNAME} \\
+                 --password ${ADMIN_PASSWORD} \\
+                 --firstname ${ADMIN_FIRSTNAME} \\
+                 --lastname ${ADMIN_LASTNAME} \\
+                 --role Admin \\
+                 --email ${ADMIN_MAIL}"
+
+  webserver:
+    build:  
+      context: .
+      dockerfile: Dockerfile
+    user: root
+    depends_on:
+      - airflow-metadata
+      - init-airflow
+    networks:
+      - app_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts/
+      - ./data:/opt/airflow/data/
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - ../config/airflow.conf
+    environment:
+      - LOAD_X = n
+      - EXECUTOR=Local
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}
+      - AIRFLOW__CORE__FERNET_KEY=${FERNET_KEY}
+      - AIRFLOW__WEBSERVER__DEFAULT__USER_USERNAME=${AIRFLOW__WEBSERVER__DEFAULT__USER_USERNAME}
+      - AIRFLOW__WEBSERVER__DEFAULT__USER_PASSWORD=${AIRFLOW__WEBSERVER__DEFAULT__USER_PASSWORD}
+      - AIRFLOW_WWW_USER_USERNAME=${AIRFLOW_WWW_USER_USERNAME}
+      - AIRFLOW_WWW_USER_PASSWORD=${AIRFLOW_WWW_USER_PASSWORD}
+      - AIRFLOW__WEBSERVER__SECRET_KEY=${AIRFLOW__WEBSERVER__SECRET_KEY}
+    ports:
+      - "8080:8080"
+    command: webserver
+
+
+  scheduler:
+    build:  
+      context: .
+      dockerfile: Dockerfile
+    user: root
+    depends_on:
+      - airflow-metadata
+      - init-airflow
+    networks:
+      - app_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts/
+      - ./data:/opt/airflow/data/
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - LOAD_X = n
+      - EXECUTOR=Local
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}
+      - AIRFLOW__CORE__FERNET_KEY=${FERNET_KEY}
+      - AIRFLOW__WEBSERVER__DEFAULT__USER_USERNAME=${AIRFLOW__WEBSERVER__DEFAULT__USER_USERNAME}
+      - AIRFLOW__WEBSERVER__DEFAULT__USER_PASSWORD=${AIRFLOW__WEBSERVER__DEFAULT__USER_PASSWORD}
+      - AIRFLOW_WWW_USER_USERNAME=${AIRFLOW_WWW_USER_USERNAME}
+      - AIRFLOW_WWW_USER_PASSWORD=${AIRFLOW_WWW_USER_PASSWORD}
+      - AIRFLOW__WEBSERVER__SECRET_KEY=${AIRFLOW__WEBSERVER__SECRET_KEY}
+    command: scheduler
+
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - static_volume:/home/app/web/static
+      - media_volume:/home/app/web/media
+      - ../nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 80:80
+    restart: always
+    depends_on:
+      - django_service
+    networks:
+      - app_network
+
+
+volumes:
+  postgres_data_silver:
+  postgres_data_gold:
+  static_volume:
+  media_volume:
+
+
+networks:
+  app_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24

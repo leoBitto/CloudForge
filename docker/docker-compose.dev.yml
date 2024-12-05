@@ -52,6 +52,22 @@ services:
       app_network:
         ipv4_address: 192.168.100.4
 
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - static_volume:/home/app/web/static
+      - media_volume:/home/app/web/media
+      - ../nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 80:80
+    restart: always
+    depends_on:
+      - django_service
+    networks:
+      - app_network
+
+
 volumes:
   postgres_data_silver:
   postgres_data_gold:
