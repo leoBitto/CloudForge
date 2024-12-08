@@ -1,9 +1,10 @@
 services:
-  django_service:
+  # Django app
+  django-app:
     build:
       context: ../
       dockerfile: ./docker/django/Dockerfile
-    image: django_service
+    image: django-app
     restart: always
     command: gunicorn base.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120
     volumes:
@@ -14,66 +15,170 @@ services:
     env_file:
       - ../config/django.conf
     depends_on:
-      db_silver:
+      postgres-silver:
         condition: service_healthy
-      db_gold:
+      postgres-gold:
         condition: service_healthy
     networks:
-      app_network:
-        ipv4_address: 192.168.100.2
+      - app_network
 
-  db_silver:
+  # Postgres silver database
+  postgres-silver:
     image: postgres:15
     volumes:
       - postgres_data_silver:/var/lib/postgresql/data/
     env_file:
       - ../config/silver.conf
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
-      app_network:
-        ipv4_address: 192.168.100.3
+      - app_network
 
-  db_gold:
+  # Postgres gold database
+  postgres-gold:
     image: postgres:15
     volumes:
       - postgres_data_gold:/var/lib/postgresql/data/
     env_file:
       - ../config/gold.conf
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
-      app_network:
-        ipv4_address: 192.168.100.4
+      - app_network
 
+  # service to make migration and create superuser, it start then stop
+  django-init:
+    build:
+      context: ../
+      dockerfile: ./docker/django/Dockerfile
+    depends_on:
+      postgres-silver:
+        condition: service_healthy
+      postgres-gold:
+        condition: service_healthy
+    env_file:
+      - ../config/django.conf
+    volumes:
+      - static_volume:/home/app/web/static
+      - media_volume:/home/app/web/media
+    command: >
+      bash -c "
+      python manage.py makemigrations --noinput &&
+      python manage.py migrate --noinput &&
+      python manage.py migrate --noinput --database=gold &&
+      python manage.py collectstatic --noinput --clear &&
+      python create_superuser.py
+      "
+    networks:
+      - app_network
 
-  nginx:
+  airflow-db:
+    image: postgres:13
+    env_file:
+      - ../config/airflow-db.conf
+    volumes:
+      - airflow_metadata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    restart: always
+    networks:
+      - app_network
+
+  airflow-webserver:
+    image: apache/airflow:2.10.3
+    env_file:
+      - ../config/airflow-db.conf
+      - ../config/airflow.conf
+    volumes:
+      - ../src/airflow/dags:/opt/airflow/dags
+      - ../src/airflow/logs:/opt/airflow/logs
+      - ../src/airflow/plugins:/opt/airflow/plugins
+      - /var/run/docker.sock:/var/run/docker.sock
+    expose:
+      - 8080
+    command: bash -c  "airflow webserver"
+    depends_on:
+      - airflow-db
+      - airflow-init
+    restart: always
+    networks:
+      - app_network
+
+  airflow-scheduler:
+    image: apache/airflow:2.10.3
+    env_file:
+      - ../config/airflow-db.conf
+      - ../config/airflow.conf
+    volumes:
+      - ../src/airflow/dags:/opt/airflow/dags
+      - ../src/airflow/logs:/opt/airflow/logs
+      - ../src/airflow/plugins:/opt/airflow/plugins
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: bash -c "airflow scheduler"
+    depends_on:
+      - airflow-db
+      - airflow-init
+    restart: always
+    networks:
+      - app_network
+
+  airflow-init:
+    image: apache/airflow:2.10.3
+    env_file:
+      - ../config/airflow-db.conf
+      - ../config/airflow.conf
+    volumes:
+      - ../src/airflow/dags:/opt/airflow/dags
+      - ../src/airflow/logs:/opt/airflow/logs
+      - ../src/airflow/plugins:/opt/airflow/plugins
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: >
+      bash -c " env && 
+                airflow db init &&
+                airflow db migrate &&
+                airflow users create \\
+                 --username admin \\
+                 --password admin \\
+                 --firstname admin \\
+                 --lastname admin \\
+                 --role Admin \\
+                 --email admin@example.com"
+    depends_on:
+      - airflow-db
+    networks:
+      - app_network
+
+  # Nginx reverse proxy
+  nginx-proxy:
     image: nginx:latest
     volumes:
       - static_volume:/home/app/web/static
       - media_volume:/home/app/web/media
       - ../nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - 80:80
+      - "80:80"
     restart: always
     depends_on:
-      - django_service
+      - django-app
+      - airflow-webserver 
     networks:
       - app_network
-
 
 volumes:
   postgres_data_silver:
   postgres_data_gold:
+  airflow_metadata:
   static_volume:
   media_volume:
-
 
 networks:
   app_network:

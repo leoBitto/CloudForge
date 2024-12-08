@@ -1,66 +1,4 @@
 services:
-  # Airflow database (metadata)
-  airflow-db:
-    image: postgres:15
-    volumes:
-      - airflow_metadata_data:/var/lib/postgresql/data/
-    env_file:
-      - ../config/airflow-db.conf
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - app_network
-
-  # Airflow init: servizio per inizializzare il database e creare l'utente admin
-  airflow-init:
-    image: apache/airflow:latest
-    depends_on:
-      airflow-db:
-        condition: service_healthy
-    networks:
-      - app_network
-    env_file:
-      - ../config/airflow.conf
-    command: >
-      bash -c "
-      airflow db migrate &&
-      airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@example.com --password admin
-      "
-    restart: "no"
-
-  # Airflow webserver
-  airflow-webserver:
-    image: apache/airflow:latest
-    depends_on:
-      airflow-init:
-        condition: service_completed_successfully
-    networks:
-      - app_network
-    volumes:
-      - ../src/airflow/dags:/opt/airflow/dags
-    env_file:
-      - ../config/airflow.conf
-    ports:
-      - "8080:8080"
-    command: webserver
-
-  # Airflow scheduler
-  airflow-scheduler:
-    image: apache/airflow:latest
-    depends_on:
-      airflow-init:
-        condition: service_completed_successfully
-    networks:
-      - app_network
-    volumes:
-      - ../src/airflow/dags:/opt/airflow/dags
-    env_file:
-      - ../config/airflow.conf
-    command: scheduler
-
   # Django app
   django-app:
     build:
@@ -114,27 +52,34 @@ services:
     networks:
       - app_network
 
-
+  # service to make migration and create superuser, it start then stop
   django-init:
     build:
       context: ../
       dockerfile: ./docker/django/Dockerfile
     depends_on:
-      - postgres-silver
-      - postgres-gold
-      - django-app
+      postgres-silver:
+        condition: service_healthy
+      postgres-gold:
+        condition: service_healthy
     env_file:
       - ../config/django.conf
+    volumes:
+      - static_volume:/home/app/web/static
+      - media_volume:/home/app/web/media
     command: >
       bash -c "
+      env &&
       python manage.py makemigrations --noinput &&
       python manage.py migrate --noinput &&
       python manage.py migrate --noinput --database=gold &&
       python manage.py collectstatic --noinput --clear &&
-      python manage.py createsuperuser --noinput --username $DJANGO_ADMIN_USER --email $DJANGO_ADMIN_EMAIL
+      python create_superuser.py
       "
     networks:
       - app_network
+
+
 
   # Nginx reverse proxy
   nginx-proxy:
@@ -148,13 +93,14 @@ services:
     restart: always
     depends_on:
       - django-app
+      - airflow-webserver 
     networks:
       - app_network
 
 volumes:
   postgres_data_silver:
   postgres_data_gold:
-  airflow_metadata_data:
+  airflow_metadata:
   static_volume:
   media_volume:
 

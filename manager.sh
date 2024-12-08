@@ -1,5 +1,5 @@
 #!/bin/bash
-COMPOSEFILE="./docker/docker-compose.two.yml"
+COMPOSEFILE="./docker/docker-compose.dev.yml"
 
 # Questa funzione elimina le immagini precedenti e avvia i container
 build_and_start_containers() {
