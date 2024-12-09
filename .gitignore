@@ -1,0 +1,58 @@
+# Ambiente Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+*.env
+*.venv
+.env.example
+
+# Configurazione temporanea di Airflow
+# Ignora tutto tranne i DAG .py
+src/airflow/dags/*
+!src/airflow/dags/*.py
+
+# Log di Airflow
+src/airflow/logs/
+
+# File temporanei di Airflow
+src/airflow/*.db
+src/airflow/*.pid
+src/airflow/airflow.cfg
+src/airflow/airflow-monitoring.db
+
+# File temporanei di sistema
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.DS_Store
+
+# Docker e Build
+docker-compose.override.yml
+**/Dockerfile.dev
+**/Dockerfile.test
+docker-logs/
+docker-data/
+
+# File di servizio
+.idea/
+.vscode/
+*.iml
+*.ipynb_checkpoints
+
+# Output Streamlit
+src/streamlit/__pycache__/
+src/streamlit/.streamlit/
+
+# Backup e file compressi
+*.gz
+*.zip
+*.tar
+*.rar
+*.7z

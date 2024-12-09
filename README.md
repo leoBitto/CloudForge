@@ -1,6 +1,8 @@
 # DataFoundry
 
-<img src="docs/assets/img/DataFoundry.png" alt="DataFoundry" width="300"/>
+<p align="center">
+  <img src="docs/assets/img/DataFoundry.png" alt="DataFoundry" width="300"/>
+</p>
 
 [![License](https://img.shields.io/badge/license-GNU-blue)](LICENSE)
 ![Python Version](https://img.shields.io/badge/python-3.10%2B-brightgreen)
