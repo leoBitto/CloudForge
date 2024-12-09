@@ -1,28 +1,37 @@
 # DataFoundry
 
+<img src="docs/assets/img/DataFoundry.png" alt="DataFoundry" width="300"/>
+
 [![License](https://img.shields.io/badge/license-GNU-blue)](LICENSE)
 ![Python Version](https://img.shields.io/badge/python-3.10%2B-brightgreen)
 [![GitHub Issues](https://img.shields.io/github/issues/leoBitto/DataFoundry)](https://github.com/leoBitto/DataFoundry/issues)
 [![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-green)](https://github.com/leoBitto/DataFoundry)
 
-![DataFoundry](docs/assets/img/DataFoundry.png)
+Welcome to **DataFoundry** 🚀, a flexible and scalable platform designed to orchestrate **data engineering workflows** for small and medium-sized enterprises (SMEs).  
 
-Welcome to **DataFoundry**, a flexible and scalable platform designed to orchestrate **data engineering workflows** for small and medium-sized enterprises (SMEs). DataFoundry combines the power of modern tools like Django, Airflow, PostgreSQL, Grafana, Prometheus, and Streamlit to deliver an **end-to-end solution** for data-driven automation and monitoring.
+DataFoundry seamlessly integrates tools for **data automation**, **monitoring**, and **business analytics**:  
+- **Django**: Build business-driven web applications with ease.  
+- **Streamlit**: Deliver interactive **visual insights** and data visualizations.  
+- **Airflow**: Automate and manage your data pipelines.  
+- **PostgreSQL**: Separate data storage layers (**Gold** & **Silver**) for different quality of the data.  
+- **Grafana & Prometheus**: Monitor and alert on system health and performance.  
 
----
-
-## Features
-
-- **Django**: Core web application framework for building robust business applications.
-- **Airflow**: Workflow automation and scheduling for data pipelines.
-- **PostgreSQL (Gold & Silver)**: Two PostgreSQL instances for different layers of data quality.
-- **Grafana & Prometheus**: Monitoring and alerting for system health and performance.
-- **Streamlit**: Data visualization and interactive web applications.
-- **Nginx**: Reverse proxy to handle and route incoming requests.
+Together, these tools provide an **end-to-end solution** for automating workflows, analyzing data, and supporting business decision-making.
 
 ---
 
-## Getting Started
+## Features ✨
+
+- **Django**: Core framework for building dynamic and robust business applications.  
+- **Streamlit**: Visualize your data interactively with custom dashboards.  
+- **Airflow**: Automate workflows and orchestrate complex data pipelines.  
+- **PostgreSQL (Gold & Silver)**: Two instances to manage refined and aggregated data.  
+- **Grafana & Prometheus**: Monitor metrics and get real-time system insights.  
+- **Nginx**: Proxy and route requests efficiently.  
+
+---
+
+## Getting Started 🛠️
 
 Follow these steps to get DataFoundry up and running locally:
 
@@ -48,7 +57,7 @@ Follow these steps to get DataFoundry up and running locally:
 
 ---
 
-## Project Structure
+## Project Structure 📂
 
 ```plaintext
 DataFoundry/
@@ -99,7 +108,7 @@ DataFoundry/
 
 ---
 
-## Contributing
+## Contributing 🤝
 
 Contributions are welcome! If you'd like to contribute to **DataFoundry**, please follow these steps:
 
@@ -111,16 +120,14 @@ Contributions are welcome! If you'd like to contribute to **DataFoundry**, pleas
 
 ---
 
-## License
+## License 📜
 
 This project is licensed under the **GNU General Public License (GPL)**. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-## Contact
+## Contact 📬
 
 For any questions, suggestions, or feedback, feel free to open an issue on [GitHub](https://github.com/leoBitto/DataFoundry/issues).
 
 ---
-
-Cosa ne pensi? Fammi sapere se vorresti ulteriori modifiche!
