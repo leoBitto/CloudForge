@@ -16,16 +16,16 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Carica configurazione da 'django.conf' in development
-config_file = os.path.join(BASE_DIR.parent.parent, 'config', 'django.conf')
+# # Carica configurazione da 'django.conf' in development
+# config_file = os.path.join(BASE_DIR.parent.parent, 'config', 'django.conf')
 
-if os.path.exists(config_file):
-    with open(config_file) as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith("#"):  # Ignora righe vuote e commenti
-                key, value = line.split('=', 1)
-                os.environ[key.strip()] = value.strip()  # Rimuove spazi extra
+# if os.path.exists(config_file):
+#     with open(config_file) as f:
+#         for line in f:
+#             line = line.strip()
+#             if line and not line.startswith("#"):  # Ignora righe vuote e commenti
+#                 key, value = line.split('=', 1)
+#                 os.environ[key.strip()] = value.strip()  # Rimuove spazi extra
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 

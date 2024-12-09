@@ -3,74 +3,33 @@ COMPOSEFILE="./docker/docker-compose.dev.yml"
 
 # Questa funzione elimina le immagini precedenti e avvia i container
 build_and_start_containers() {
-    # Elimina i container e i volumi esistenti (opzionale)
+    echo "Eliminazione dei container e volumi esistenti..."
     sudo docker compose -f $COMPOSEFILE down -v --remove-orphans
 
-    # Avvia i container Docker in background e ricrea le immagini se necessario
-    sudo docker compose -f $COMPOSEFILE up -d --build || echo "i could not build the images" 
+    echo "Creazione e avvio dei container Docker..."
+    sudo docker compose -f $COMPOSEFILE up --build || echo "Non è stato possibile costruire le immagini"
     echo "Immagini create"
-
-    echo "Waiting for dbs to start properly"
-    sleep 5
-
-    # Applica le migrazioni del database all'interno del container "django_service"
-    sudo docker compose -f $COMPOSEFILE exec django_service python manage.py makemigrations --noinput || echo "i found and error trying to make migrations...."
-    
-    sudo docker compose -f $COMPOSEFILE exec django_service python manage.py migrate --noinput
-    sudo docker compose -f $COMPOSEFILE exec django_service python manage.py migrate --noinput --database=gold
-    echo "Migrazioni eseguite"
-
-    # Raccoglie i file statici all'interno del container "django_service", cancellando quelli esistenti
-    sudo docker compose -f $COMPOSEFILE exec django_service python manage.py collectstatic --noinput --clear
-    echo "File statici raccolti"
-
-    # Crea un superuser con le credenziali dalle variabili d'ambiente
-    sudo docker compose -f $COMPOSEFILE exec django_service python manage.py createsuperuser 
-
-    # Esegui i test di Django
-    echo "Esecuzione dei test di Django..."
-    sudo docker compose -f $COMPOSEFILE exec django_service python manage.py test || echo "I test non sono stati superati, controlla gli errori"
 
 }
 
 # Questa funzione avvia solo i container Docker
 start_containers() {
-    # Avvia i container Docker in background 
-    sudo docker compose -f $COMPOSEFILE up -d 
-    echo "Immagini create"
-
-    # Applica le migrazioni del database all'interno del container "django_service"
-    sudo docker compose -f $COMPOSEFILE exec django_service python manage.py makemigrations --noinput
-
-    sudo docker compose -f $COMPOSEFILE exec django_service python manage.py migrate --noinput
-    sudo docker compose -f $COMPOSEFILE exec django_service python manage.py migrate --noinput --database=gold
-    echo "Migrazioni eseguite"
-
-    # Raccoglie i file statici all'interno del container "django_service", cancellando quelli esistenti
-    sudo docker compose -f $COMPOSEFILE exec django_service python manage.py collectstatic --noinput --clear
-    echo "File statici raccolti"
-
-    echo "Server in esecuzione"
-
-    # Esegui i test di Django
-    echo "Esecuzione dei test di Django..."
-    sudo docker compose -f $COMPOSEFILE exec django_service python manage.py test || echo "I test non sono stati superati, controlla gli errori"
-
+    echo "Avvio dei container Docker in background..."
+    sudo docker compose -f $COMPOSEFILE up -d
+    echo "Container avviati"
 }
 
 # Questa funzione ferma i container Docker
 stop_containers() {
-    # Ferma tutti i container precedenti
+    echo "Arresto di tutti i container Docker..."
     sudo docker compose -f $COMPOSEFILE down
-
     echo "Server fermato"
 }
 
 # Questa funzione elimina tutti i container e i volumi
 destroy_containers() {
-    # Elimina tutti i container e i volumi associati
+    echo "Eliminazione di tutti i container e volumi..."
     sudo docker compose -f $COMPOSEFILE down -v --remove-orphans
-
     echo "Container e volumi eliminati"
 }
 
