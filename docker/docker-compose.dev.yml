@@ -100,7 +100,7 @@ services:
       - ../config/airflow.conf
     volumes:
       - ../src/airflow/dags:/opt/airflow/dags
-      - ../src/airflow/logs:/opt/airflow/logs
+      #- ../src/airflow/logs:/opt/airflow/logs
       - ../src/airflow/plugins:/opt/airflow/plugins
       - /var/run/docker.sock:/var/run/docker.sock
     expose:
@@ -120,7 +120,7 @@ services:
       - ../config/airflow.conf
     volumes:
       - ../src/airflow/dags:/opt/airflow/dags
-      - ../src/airflow/logs:/opt/airflow/logs
+      #- ../src/airflow/logs:/opt/airflow/logs
       - ../src/airflow/plugins:/opt/airflow/plugins
       - /var/run/docker.sock:/var/run/docker.sock
     command: bash -c "airflow scheduler"
@@ -138,7 +138,7 @@ services:
       - ../config/airflow.conf
     volumes:
       - ../src/airflow/dags:/opt/airflow/dags
-      - ../src/airflow/logs:/opt/airflow/logs
+      #- ../src/airflow/logs:/opt/airflow/logs
       - ../src/airflow/plugins:/opt/airflow/plugins
       - /var/run/docker.sock:/var/run/docker.sock
     command: >
