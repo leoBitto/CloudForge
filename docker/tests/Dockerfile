@@ -17,5 +17,10 @@ COPY ./src/ .
 # Copia la cartella dei test
 COPY ./tests/ ./tests/
 
+
+# Comandi di debug
+RUN pwd
+RUN ls -R ./tests
+
 # Aggiungi un comando per eseguire i test (puoi personalizzarlo come vuoi)
-CMD ["pytest", "--maxfail=5", "--disable-warnings", "--maxfail=1"]
+CMD ["pytest", "/home/app/tests", "--maxfail=5", "--disable-warnings", "--maxfail=1"]

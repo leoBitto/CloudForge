@@ -6,8 +6,7 @@ from psycopg2 import OperationalError
 
 # Test database connectivity for both silver and gold databases
 def test_postgres_silver_connection():
-    # Wait for the silver database to be ready
-    time.sleep(10)  # Sleep for 10 seconds to ensure the database is ready
+    time.sleep(10)
     try:
         conn = psycopg2.connect(
             dbname="silver_db", 
@@ -21,8 +20,7 @@ def test_postgres_silver_connection():
         pytest.fail(f"Silver database connection failed: {e}")
 
 def test_postgres_gold_connection():
-    # Wait for the gold database to be ready
-    time.sleep(10)  # Sleep for 10 seconds to ensure the database is ready
+    time.sleep(10)
     try:
         conn = psycopg2.connect(
             dbname="gold_db", 
@@ -39,14 +37,14 @@ def test_postgres_gold_connection():
 def test_migrations_silver():
     try:
         result = subprocess.run(
-            ["docker-compose", "exec", "-T", "django-app", "python", "manage.py", "makemigrations"],
+            ["docker", "compose", "exec", "-T", "django-app", "python", "manage.py", "makemigrations"],
             capture_output=True, text=True
         )
         if "No changes detected" not in result.stdout:
             pytest.fail(f"Migrations for silver database failed: {result.stderr}")
         
         result = subprocess.run(
-            ["docker-compose", "exec", "-T", "django-app", "python", "manage.py", "migrate", "--database=silver"],
+            ["docker", "compose", "exec", "-T", "django-app", "python", "manage.py", "migrate", "--database=silver"],
             capture_output=True, text=True
         )
         if result.returncode != 0:
@@ -57,21 +55,18 @@ def test_migrations_silver():
 # Test the migration process for gold database (simplified)
 def test_migrations_gold():
     try:
-        # Run migrations on the gold database
         result = subprocess.run(
-            ["docker-compose", "exec", "-T", "django-app", "python", "manage.py", "makemigrations"],
+            ["docker", "compose", "exec", "-T", "django-app", "python", "manage.py", "makemigrations"],
             capture_output=True, text=True
         )
         if "No changes detected" not in result.stdout:
             pytest.fail(f"Migrations for gold database failed: {result.stderr}")
         
         result = subprocess.run(
-            ["docker-compose", "exec", "-T", "django-app", "python", "manage.py", "migrate", "--database=gold"],
+            ["docker", "compose", "exec", "-T", "django-app", "python", "manage.py", "migrate", "--database=gold"],
             capture_output=True, text=True
         )
         if result.returncode != 0:
             pytest.fail(f"Migration failed for gold database: {result.stderr}")
     except Exception as e:
         pytest.fail(f"Error during migration for gold database: {e}")
-
-

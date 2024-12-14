@@ -174,7 +174,6 @@ services:
       - app_network
 
 
-  # Servizio per eseguire i test
   test-runner:
     build:
       context: ../
@@ -193,7 +192,6 @@ services:
     volumes:
       - ../tests:/home/app/tests 
     command: pytest /home/app/tests --disable-warnings -v
-    #restart: "no"  # Non c'è bisogno di riavviarlo
 
 
 volumes:
