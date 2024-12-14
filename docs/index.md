@@ -1,64 +1,131 @@
-# DjangoForge Documentation
+# DataFoundry Documentation  
 
-Welcome to the official documentation for **DjangoForge**, a modular Django ecosystem designed for small and medium-sized enterprises (SMEs). This documentation will guide you through the installation, configuration, usage, and development of DjangoForge.
-
-
-## Table of Contents
-
-1. [Introduction](#introduction)
-2. [Getting Started](#getting-started)
-   - [Installation]({{ site.baseurl }}/installation/)
-   - [Deploy the Application]({{ site.baseurl }}/deployment/)
-3. [Project Structure](#project-structure)
-4. [Usage](#usage)
-   - [Base Project]({{ site.baseurl }}/base/)
-   - [Tier 1 Applications]({{ site.baseurl }}/tier1/)
-   - [Tier 2 Applications]({{ site.baseurl }}/tier2/)
-6. [Contributing]({{ site.baseurl }}/CONTRIBUTING/)
-7. [Code of Conduct]({{ site.baseurl }}/CODE_OF_CONDUCT/)
-8. [License]({{ site.baseurl }}/LICENSE/)
-
-
-## Introduction
-
-DjangoForge is a comprehensive and customizable platform built on Django, aimed at delivering robust business solutions for SMEs. The ecosystem is structured into three main tiers:
-
-- **Base Project**: Core functionalities and common apps needed by the entire ecosystem.
-- **Tier 1**: General business applications like CRM, ERP, and more, built on top of the Base Project.
-- **Tier 2**: Industry-specific applications that extend Tier 1 apps with tailored functionalities for particular business needs.
-
-This documentation is intended to help developers, administrators, and users to effectively use and contribute to DjangoForge.
-
-## Getting Started
-
-If you're new to DjangoForge, start by [installing]({{ site.baseurl }}/installation.md) the application and configuring your development environment.
-
-## Project Structure
-
-DjangoForge is organized to be modular and scalable. Learn more about how the project is structured in the following section.
-
-## Usage
-
-DjangoForge includes a variety of applications to meet different business needs. Explore the functionality of the:
-
-- **[Base Project]({{ site.baseurl }}/base/)**: Core modules and features.
-- **[Tier 1 Applications]({{ site.baseurl }}/tier1/)**: General business apps like CRM, ERP, and more.
-- **[Tier 2 Applications]({{ site.baseurl }}/tier2/)**: Industry-specific extensions for vertical markets.
-
-
-## Contributing
-
-We welcome contributions from the community! If you want to contribute to DjangoForge, please read the [Contributing Guidelines]({{ site.baseurl }}/CONTRIBUTING.md) to get started.
-
-## Code of Conduct
-
-Please note that we have a [Code of Conduct]({{ site.baseurl }}/CODE_OF_CONDUCT.md) in place to ensure a welcoming environment for everyone. Please read it before contributing.
-
-## License
-
-DjangoForge is released under the [GPL License]({{ site.baseurl }}/LICENSE.md). Please refer to the license file for details on how you can use and distribute DjangoForge.
-
+Welcome to the official documentation for **DataFoundry**, a modular and scalable platform designed to orchestrate **data engineering workflows** for small and medium-sized enterprises (SMEs). This documentation will guide you through the **installation**, **configuration**, **usage**, and **development** of DataFoundry.  
 
 ---
 
-Thank you for using DjangoForge! If you encounter any issues or have suggestions, feel free to open an issue on GitHub.
+## Table of Contents  
+
+1. [Introduction](#introduction)  
+2. [Getting Started](#getting-started)  
+   - [Installation]({{ site.baseurl }}/installation/)  
+   - [Running the Project]({{ site.baseurl }}/run-project/)  
+   - [Environment Setup]({{ site.baseurl }}/env-setup/)  
+3. [Project Structure](#project-structure)  
+4. [Services Overview](#services-overview)  
+   - [Django]({{ site.baseurl }}/services/django/)  
+   - [Airflow]({{ site.baseurl }}/services/airflow/)  
+   - [Streamlit]({{ site.baseurl }}/services/streamlit/)  
+   - [PostgreSQL (Gold & Silver)]({{ site.baseurl }}/services/postgresql/)  
+   - [Grafana & Prometheus]({{ site.baseurl }}/services/monitoring/)  
+   - [Nginx]({{ site.baseurl }}/services/nginx/)  
+5. [Usage](#usage)  
+   - [Managing Workflows with Airflow]({{ site.baseurl }}/usage/airflow/)  
+   - [Building Dashboards with Streamlit]({{ site.baseurl }}/usage/streamlit/)  
+   - [Monitoring with Grafana & Prometheus]({{ site.baseurl }}/usage/monitoring/)  
+6. [Configuration](#configuration)  
+   - [Environment Variables]({{ site.baseurl }}/configuration/env-vars/)  
+   - [Service-Specific Configuration]({{ site.baseurl }}/configuration/service-configs/)  
+7. [Development Guidelines](#development-guidelines)  
+   - [Extending DataFoundry]({{ site.baseurl }}/development/extending/)  
+   - [Adding New Airflow DAGs]({{ site.baseurl }}/development/airflow-dags/)  
+   - [Custom Django Applications]({{ site.baseurl }}/development/django-apps/)  
+8. [Contributing]({{ site.baseurl }}/CONTRIBUTING/)  
+9. [Code of Conduct]({{ site.baseurl }}/CODE_OF_CONDUCT/)  
+10. [License]({{ site.baseurl }}/LICENSE/)  
+
+---
+
+## Introduction  
+
+**DataFoundry** is a robust platform that combines **data automation**, **monitoring**, and **business analytics** into a single environment. It provides:  
+
+- **Workflow orchestration** with Airflow.  
+- **Interactive dashboards** using Streamlit.  
+- **System monitoring** with Grafana and Prometheus.  
+- A modular architecture that ensures flexibility and scalability for SMEs.  
+
+This documentation will help you get started with DataFoundry, configure its components, and extend its functionalities.  
+
+---
+
+## Getting Started  
+
+If you are new to DataFoundry, start with:  
+
+1. **Installation**: Learn how to install and set up the platform locally.  
+2. **Running the Project**: Instructions to spin up the entire stack using Docker.  
+3. **Environment Setup**: Setting up variables and configurations.  
+
+---
+
+## Project Structure  
+
+DataFoundry is organized into modular components for easy management. Explore the [Project Structure]({{ site.baseurl }}/project-structure) section to understand the role of each directory.  
+
+---
+
+## Services Overview  
+
+DataFoundry integrates the following services:  
+
+- **Django**: Build robust web applications.  
+- **Airflow**: Orchestrate and automate data workflows.  
+- **Streamlit**: Create visualizations and interactive dashboards.  
+- **PostgreSQL (Gold & Silver)**: Dual-layered database management for refined and raw data.  
+- **Grafana & Prometheus**: Monitor system health and performance metrics.  
+- **Nginx**: Proxy and route requests efficiently.  
+
+---
+
+## Usage  
+
+### Workflow Automation  
+Manage and monitor complex data workflows with **Airflow**. See the [Airflow Usage Guide]({{ site.baseurl }}/usage/airflow).  
+
+### Dashboard Creation  
+Build interactive dashboards to visualize your data using **Streamlit**. Learn more in the [Streamlit Usage Guide]({{ site.baseurl }}/usage/streamlit).  
+
+### Monitoring  
+Get real-time insights and alerts on your system health with **Grafana & Prometheus**.  
+
+---
+
+## Configuration  
+
+Learn how to configure DataFoundry to suit your environment:  
+
+- Set up environment variables.  
+- Adjust configurations for each service.  
+
+---
+
+## Development Guidelines  
+
+Want to extend or customize DataFoundry? Check out the development section for:  
+
+- Adding new **Airflow DAGs**.  
+- Creating custom **Django applications**.  
+- Extending platform functionalities.  
+
+---
+
+## Contributing  
+
+Contributions are welcome! To get started, read our [Contributing Guidelines]({{ site.baseurl }}/CONTRIBUTING/).  
+
+## Code of Conduct  
+
+Please adhere to our [Code of Conduct]({{ site.baseurl }}/CODE_OF_CONDUCT/) to maintain a welcoming community.  
+
+## License  
+
+DataFoundry is licensed under the **GNU GPL**. See the [License]({{ site.baseurl }}/LICENSE) file for details.  
+
+---
+
+## Contact  
+
+For any questions or feedback, feel free to open an issue on [GitHub](https://github.com/leoBitto/DataFoundry/issues).  
+
+---
