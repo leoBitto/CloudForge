@@ -69,6 +69,7 @@ For deploying DataFoundry in a production environment, automated pipelines are p
 Ensure the following requirements are met:  
 - **Docker** and **Docker Compose** installed on the target server.  
 - A **CI/CD pipeline** configured (e.g., GitHub Actions).  
+- A domain name and SSL certificates for secure access to the services.
 
 ### Steps  
 

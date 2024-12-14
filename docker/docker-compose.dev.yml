@@ -173,6 +173,29 @@ services:
     networks:
       - app_network
 
+
+  # Servizio per eseguire i test
+  test-runner:
+    build:
+      context: ../
+      dockerfile: ./docker/tests/Dockerfile
+    image: test-runner
+    depends_on:
+      - django-app
+      - postgres-silver
+      - postgres-gold
+    networks:
+      - app_network
+    env_file:
+      - ../config/django.conf
+      - ../config/silver.conf
+      - ../config/gold.conf
+    volumes:
+      - ../tests:/home/app/tests 
+    command: pytest /home/app/tests --disable-warnings -v
+    #restart: "no"  # Non c'è bisogno di riavviarlo
+
+
 volumes:
   postgres_data_silver:
   postgres_data_gold:
