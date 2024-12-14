@@ -1,5 +1,3 @@
-# Welcome to DataFoundry Documentation  
-
 **DataFoundry** is a modular and scalable platform designed to orchestrate **data engineering workflows** for small and medium-sized enterprises (SMEs). It simplifies **workflow automation**, **monitoring**, and **data analytics** through an integrated ecosystem.  
 
 ---
@@ -33,14 +31,13 @@ To quickly set up and run DataFoundry, check out the following guides:
 
 DataFoundry integrates the following services to streamline data workflows:  
 
-- **Django**: Web application framework for backend services.  
-- **Airflow**: Workflow orchestration for data pipelines.  
-- **Streamlit**: Interactive data dashboards for visualization.  
-- **PostgreSQL**: Robust database management (Gold & Silver layers).  
-- **Grafana & Prometheus**: Monitoring and alerting for system health.  
-- **Nginx**: Reverse proxy and load balancing.  
+- [Django]({{ site.baseurl }}/services/django): Web application framework for backend services.  
+- [Airflow]({{ site.baseurl }}/services/airflow): Workflow orchestration for data pipelines.  
+- [Streamlit]({{ site.baseurl }}/services/streamlit): Interactive data dashboards for visualization.  
+- [PostgreSQL]({{ site.baseurl }}/services/postgresql): Robust database management (Gold & Silver layers).  
+- [Grafana & Prometheus]({{ site.baseurl }}/services/monitoring): Monitoring and alerting for system health.  
+- [Nginx]({{ site.baseurl }}/services/nginx): Reverse proxy and load balancing.  
 
-For a detailed overview, refer to the [Services Documentation]({{ site.baseurl }}/services/).  
 
 ---
 
@@ -78,10 +75,6 @@ Understand the testing strategy implemented in DataFoundry:
 DataFoundry integrates automated pipelines for deployment. Refer to the [CI/CD Documentation]({{ site.baseurl }}/cicd/).  
 
 ---
-
-## Contributing  
-
-We welcome contributions! Please read our [Contributing Guidelines]({{ site.baseurl }}/CONTRIBUTING/).  
 
 ## License  
 
