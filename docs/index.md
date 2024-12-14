@@ -1,131 +1,92 @@
-# DataFoundry Documentation  
+# Welcome to DataFoundry Documentation  
 
-Welcome to the official documentation for **DataFoundry**, a modular and scalable platform designed to orchestrate **data engineering workflows** for small and medium-sized enterprises (SMEs). This documentation will guide you through the **installation**, **configuration**, **usage**, and **development** of DataFoundry.  
+**DataFoundry** is a modular and scalable platform designed to orchestrate **data engineering workflows** for small and medium-sized enterprises (SMEs). It simplifies **workflow automation**, **monitoring**, and **data analytics** through an integrated ecosystem.  
 
 ---
 
 ## Table of Contents  
 
-1. [Introduction](#introduction)  
-2. [Getting Started](#getting-started)  
-   - [Installation]({{ site.baseurl }}/installation/)  
-   - [Running the Project]({{ site.baseurl }}/run-project/)  
-   - [Environment Setup]({{ site.baseurl }}/env-setup/)  
-3. [Project Structure](#project-structure)  
-4. [Services Overview](#services-overview)  
-   - [Django]({{ site.baseurl }}/services/django/)  
-   - [Airflow]({{ site.baseurl }}/services/airflow/)  
-   - [Streamlit]({{ site.baseurl }}/services/streamlit/)  
-   - [PostgreSQL (Gold & Silver)]({{ site.baseurl }}/services/postgresql/)  
-   - [Grafana & Prometheus]({{ site.baseurl }}/services/monitoring/)  
-   - [Nginx]({{ site.baseurl }}/services/nginx/)  
-5. [Usage](#usage)  
-   - [Managing Workflows with Airflow]({{ site.baseurl }}/usage/airflow/)  
-   - [Building Dashboards with Streamlit]({{ site.baseurl }}/usage/streamlit/)  
-   - [Monitoring with Grafana & Prometheus]({{ site.baseurl }}/usage/monitoring/)  
-6. [Configuration](#configuration)  
-   - [Environment Variables]({{ site.baseurl }}/configuration/env-vars/)  
-   - [Service-Specific Configuration]({{ site.baseurl }}/configuration/service-configs/)  
-7. [Development Guidelines](#development-guidelines)  
-   - [Extending DataFoundry]({{ site.baseurl }}/development/extending/)  
-   - [Adding New Airflow DAGs]({{ site.baseurl }}/development/airflow-dags/)  
-   - [Custom Django Applications]({{ site.baseurl }}/development/django-apps/)  
-8. [Contributing]({{ site.baseurl }}/CONTRIBUTING/)  
-9. [Code of Conduct]({{ site.baseurl }}/CODE_OF_CONDUCT/)  
-10. [License](./LICENSE/)  
-
----
-
-## Introduction  
-
-**DataFoundry** is a robust platform that combines **data automation**, **monitoring**, and **business analytics** into a single environment. It provides:  
-
-- **Workflow orchestration** with Airflow.  
-- **Interactive dashboards** using Streamlit.  
-- **System monitoring** with Grafana and Prometheus.  
-- A modular architecture that ensures flexibility and scalability for SMEs.  
-
-This documentation will help you get started with DataFoundry, configure its components, and extend its functionalities.  
+1. [Getting Started](#getting-started)  
+2. [Services Overview](#services-overview)  
+3. [Usage Guidelines](#usage-guidelines)  
+4. [Configuration](#configuration)  
+5. [Development](#development)  
+6. [Testing](#testing)  
+7. [CI/CD Flows](#cicd-flows)  
+8. [Contributing](#contributing)  
+9. [License](#license)  
+10. [Contact](#contact)  
 
 ---
 
 ## Getting Started  
 
-If you are new to DataFoundry, start with:  
+To quickly set up and run DataFoundry, check out the following guides:  
 
-1. **Installation**: Learn how to install and set up the platform locally.  
-2. **Running the Project**: Instructions to spin up the entire stack using Docker.  
-3. **Environment Setup**: Setting up variables and configurations.  
-
----
-
-## Project Structure  
-
-DataFoundry is organized into modular components for easy management. Explore the [Project Structure]({{ site.baseurl }}/project-structure) section to understand the role of each directory.  
+- [Installation Guide]({{ site.baseurl }}/installation/)  
+- [Environment Setup]({{ site.baseurl }}/env-setup/)  
+- [Running the Project]({{ site.baseurl }}/run-project/)  
 
 ---
 
 ## Services Overview  
 
-DataFoundry integrates the following services:  
+DataFoundry integrates the following services to streamline data workflows:  
 
-- **Django**: Build robust web applications.  
-- **Airflow**: Orchestrate and automate data workflows.  
-- **Streamlit**: Create visualizations and interactive dashboards.  
-- **PostgreSQL (Gold & Silver)**: Dual-layered database management for refined and raw data.  
-- **Grafana & Prometheus**: Monitor system health and performance metrics.  
-- **Nginx**: Proxy and route requests efficiently.  
+- **Django**: Web application framework for backend services.  
+- **Airflow**: Workflow orchestration for data pipelines.  
+- **Streamlit**: Interactive data dashboards for visualization.  
+- **PostgreSQL**: Robust database management (Gold & Silver layers).  
+- **Grafana & Prometheus**: Monitoring and alerting for system health.  
+- **Nginx**: Reverse proxy and load balancing.  
 
----
-
-## Usage  
-
-### Workflow Automation  
-Manage and monitor complex data workflows with **Airflow**. See the [Airflow Usage Guide]({{ site.baseurl }}/usage/airflow).  
-
-### Dashboard Creation  
-Build interactive dashboards to visualize your data using **Streamlit**. Learn more in the [Streamlit Usage Guide]({{ site.baseurl }}/usage/streamlit).  
-
-### Monitoring  
-Get real-time insights and alerts on your system health with **Grafana & Prometheus**.  
+For a detailed overview, refer to the [Services Documentation]({{ site.baseurl }}/services/).  
 
 ---
 
 ## Configuration  
 
-Learn how to configure DataFoundry to suit your environment:  
+Learn how to configure DataFoundry:  
 
-- Set up environment variables.  
-- Adjust configurations for each service.  
+- [Environment Variables]({{ site.baseurl }}/configuration/env-vars/)  
+- [Service-Specific Configurations]({{ site.baseurl }}/configuration/service-configs/)  
 
 ---
 
-## Development Guidelines  
+## Development  
 
-Want to extend or customize DataFoundry? Check out the development section for:  
+Extend DataFoundry’s functionalities or add custom workflows:  
 
-- Adding new **Airflow DAGs**.  
-- Creating custom **Django applications**.  
-- Extending platform functionalities.  
+- [Extending DataFoundry]({{ site.baseurl }}/development/extending/)  
+- [Adding Airflow DAGs]({{ site.baseurl }}/development/airflow-dags/)  
+- [Custom Django Applications]({{ site.baseurl }}/development/django-apps/)  
+
+---
+
+## Testing  
+
+Understand the testing strategy implemented in DataFoundry:  
+
+- [Unit Tests]({{ site.baseurl }}/testing/unit-tests/)  
+- [Integration Tests]({{ site.baseurl }}/testing/integration-tests/)  
+- [End-to-End Tests]({{ site.baseurl }}/testing/e2e-tests/)  
+
+---
+
+## CI/CD Flows  
+
+DataFoundry integrates automated pipelines for deployment. Refer to the [CI/CD Documentation]({{ site.baseurl }}/cicd/).  
 
 ---
 
 ## Contributing  
 
-Contributions are welcome! To get started, read our [Contributing Guidelines]({{ site.baseurl }}/CONTRIBUTING/).  
-
-## Code of Conduct  
-
-Please adhere to our [Code of Conduct]({{ site.baseurl }}/CODE_OF_CONDUCT/) to maintain a welcoming community.  
+We welcome contributions! Please read our [Contributing Guidelines]({{ site.baseurl }}/CONTRIBUTING/).  
 
 ## License  
 
-DataFoundry is licensed under the **GNU GPL**. See the [License]({{ site.baseurl }}/LICENSE) file for details.  
-
----
+DataFoundry is licensed under the **GNU GPL**. See the [License File]({{ site.baseurl }}/LICENSE).  
 
 ## Contact  
 
-For any questions or feedback, feel free to open an issue on [GitHub](https://github.com/leoBitto/DataFoundry/issues).  
-
----
+For questions or feedback, open an issue on [GitHub](https://github.com/leoBitto/DataFoundry/issues).  

@@ -9,7 +9,7 @@ plugins:
 
 
 # Site settings
-title: ""
+title: "DataFoundry Docs"
 description: "Official documentation for the DataFoundry project."
 logo: "/assets/img/DataFoundry.png"
 show_downloads: true
