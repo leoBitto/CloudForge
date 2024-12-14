@@ -32,7 +32,7 @@ Welcome to the official documentation for **DataFoundry**, a modular and scalabl
    - [Custom Django Applications]({{ site.baseurl }}/development/django-apps/)  
 8. [Contributing]({{ site.baseurl }}/CONTRIBUTING/)  
 9. [Code of Conduct]({{ site.baseurl }}/CODE_OF_CONDUCT/)  
-10. [License]({{ site.baseurl }}/LICENSE/)  
+10. [License](./LICENSE/)  
 
 ---
 
