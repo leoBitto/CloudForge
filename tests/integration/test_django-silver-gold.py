@@ -1,72 +1,72 @@
 import pytest
-import subprocess
-import time
-import psycopg2
-from psycopg2 import OperationalError
+from django.conf import settings
+from django.core.management import call_command
+from django.db import connections
+import sys
 
-# Test database connectivity for both silver and gold databases
-def test_postgres_silver_connection():
-    time.sleep(10)
-    try:
-        conn = psycopg2.connect(
-            dbname="silver_db", 
-            user="silver_user", 
-            password="silver_password", 
-            host="postgres-silver", 
-            port="5432"
-        )
-        conn.close()
-    except OperationalError as e:
-        pytest.fail(f"Silver database connection failed: {e}")
+def test_print_sys_path():
+    """Test di debug per verificare il PYTHONPATH"""
+    print("\nPYTHONPATH:", sys.path)
 
-def test_postgres_gold_connection():
-    time.sleep(10)
-    try:
-        conn = psycopg2.connect(
-            dbname="gold_db", 
-            user="gold_user", 
-            password="gold_password", 
-            host="postgres-gold", 
-            port="5432"
-        )
-        conn.close()
-    except OperationalError as e:
-        pytest.fail(f"Gold database connection failed: {e}")
-
-# Test the migration process for silver database
-def test_migrations_silver():
-    try:
-        result = subprocess.run(
-            ["docker", "compose", "exec", "-T", "django-app", "python", "manage.py", "makemigrations"],
-            capture_output=True, text=True
-        )
-        if "No changes detected" not in result.stdout:
-            pytest.fail(f"Migrations for silver database failed: {result.stderr}")
+@pytest.fixture(params=["default", "silver", "gold"])
+def setup_database(request, django_db_setup, django_db_blocker):
+    """
+    Fixture che configura il database attivo in base al parametro.
+    Usa django_db_setup e django_db_blocker per gestire correttamente le connessioni.
+    """
+    database_name = request.param
+    
+    with django_db_blocker.unblock():  # Sblocca esplicitamente l'accesso al DB
+        settings.DATABASES['default'] = {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': f"{database_name}_db",
+            'USER': f"{database_name}_user",
+            'PASSWORD': f"{database_name}_password",
+            'HOST': f"postgres-{database_name}",
+            'PORT': "5432",
+        }
         
-        result = subprocess.run(
-            ["docker", "compose", "exec", "-T", "django-app", "python", "manage.py", "migrate", "--database=silver"],
-            capture_output=True, text=True
-        )
-        if result.returncode != 0:
-            pytest.fail(f"Migration failed for silver database: {result.stderr}")
-    except Exception as e:
-        pytest.fail(f"Error during migration for silver database: {e}")
-
-# Test the migration process for gold database (simplified)
-def test_migrations_gold():
-    try:
-        result = subprocess.run(
-            ["docker", "compose", "exec", "-T", "django-app", "python", "manage.py", "makemigrations"],
-            capture_output=True, text=True
-        )
-        if "No changes detected" not in result.stdout:
-            pytest.fail(f"Migrations for gold database failed: {result.stderr}")
+        # Chiudi le connessioni esistenti per applicare le nuove impostazioni
+        connections.close_all()
         
-        result = subprocess.run(
-            ["docker", "compose", "exec", "-T", "django-app", "python", "manage.py", "migrate", "--database=gold"],
-            capture_output=True, text=True
-        )
-        if result.returncode != 0:
-            pytest.fail(f"Migration failed for gold database: {result.stderr}")
+        yield database_name
+        
+        # Cleanup
+        connections.close_all()
+
+def test_database_connection(setup_database):
+    """
+    Testa che la connessione ai database sia funzionante.
+    """
+    database_name = setup_database
+    try:
+        with connections[database_name].cursor() as cursor:
+            cursor.execute("SELECT 1;")
+            result = cursor.fetchone()
+            assert result[0] == 1, f"Query returned unexpected result: {result}"
     except Exception as e:
-        pytest.fail(f"Error during migration for gold database: {e}")
+        pytest.fail(f"Connection to '{database_name}' failed: {e}")
+
+
+def test_migrations(setup_database):
+    """
+    Test migrations are applied for the configured database.
+    """
+    database_name = setup_database
+    try:
+        # Esegui migrate sul database specifico
+        call_command("migrate", "--database", database_name, "--no-input", verbosity=1)
+
+        # Verifica l'esistenza della tabella django_migrations
+        with connections[database_name].cursor() as cursor:
+            cursor.execute("""
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables
+                    WHERE table_name = 'django_migrations'
+                );
+            """)
+            table_exists = cursor.fetchone()[0]
+            assert table_exists, f"django_migrations table does not exist in {database_name} database"
+
+    except Exception as e:
+        pytest.fail(f"Migration failed for '{database_name}': {e}")

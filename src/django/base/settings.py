@@ -90,19 +90,27 @@ WSGI_APPLICATION = 'base.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("SILVER_POSTGRES_DB", BASE_DIR / "db.sqlite3"),
-        "USER": os.environ.get("SILVER_POSTGRES_USER", "user"),
-        "PASSWORD": os.environ.get("SILVER_POSTGRES_PASSWORD", "password"),
-        "HOST": os.environ.get("SILVER_SQL_HOST", "localhost"),
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.postgresql"),
+        "NAME": os.environ.get("BRONZE_POSTGRES_DB", "bronze_db"),  
+        "USER": os.environ.get("BRONZE_POSTGRES_USER", "bronze_user"),
+        "PASSWORD": os.environ.get("BRONZE_POSTGRES_PASSWORD", "bronze_password"),
+        "HOST": os.environ.get("BRONZE_SQL_HOST", "postgres-bronze"),
+        "PORT": os.environ.get("BRONZE_SQL_PORT", "5432"),
+    },
+    'silver': {
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.postgresql"),
+        "NAME": os.environ.get("SILVER_POSTGRES_DB", "silver_db"),
+        "USER": os.environ.get("SILVER_POSTGRES_USER", "silver_user"),
+        "PASSWORD": os.environ.get("SILVER_POSTGRES_PASSWORD", "silver_password"),
+        "HOST": os.environ.get("SILVER_SQL_HOST", "postgres-silver"),
         "PORT": os.environ.get("SILVER_SQL_PORT", "5432"),
     },
     'gold': {
-        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("GOLD_POSTGRES_DB", BASE_DIR / "db.sqlite3"),
-        "USER": os.environ.get("GOLD_POSTGRES_USER", "user"),
-        "PASSWORD": os.environ.get("GOLD_POSTGRES_PASSWORD", "password"),
-        "HOST": os.environ.get("GOLD_SQL_HOST", "localhost"),
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.postgresql"),
+        "NAME": os.environ.get("GOLD_POSTGRES_DB", "gold_db"),
+        "USER": os.environ.get("GOLD_POSTGRES_USER", "gold_user"),
+        "PASSWORD": os.environ.get("GOLD_POSTGRES_PASSWORD", "gold_password"),
+        "HOST": os.environ.get("GOLD_SQL_HOST", "postgres-gold"),
         "PORT": os.environ.get("GOLD_SQL_PORT", "5432"),
     }
 }

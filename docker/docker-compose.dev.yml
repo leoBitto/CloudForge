@@ -22,6 +22,21 @@ services:
     networks:
       - app_network
 
+  # Postgres bronze database
+  postgres-bronze:
+    image: postgres:15
+    volumes:
+      - postgres_data_bronze:/var/lib/postgresql/data/
+    env_file:
+      - ../config/bronze.conf
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+
   # Postgres silver database
   postgres-silver:
     image: postgres:15
@@ -71,6 +86,7 @@ services:
       bash -c "
       python manage.py makemigrations --noinput &&
       python manage.py migrate --noinput &&
+      python manage.py migrate --noinput --database=silver &&
       python manage.py migrate --noinput --database=gold &&
       python manage.py collectstatic --noinput --clear &&
       python create_superuser.py
@@ -180,9 +196,8 @@ services:
       dockerfile: ./docker/tests/Dockerfile
     image: test-runner
     depends_on:
-      - django-app
-      - postgres-silver
-      - postgres-gold
+      django-init:
+        condition: service_completed_successfully
     networks:
       - app_network
     env_file:
@@ -191,10 +206,11 @@ services:
       - ../config/gold.conf
     volumes:
       - ../tests:/home/app/tests 
-    command: pytest /home/app/tests --disable-warnings -v
+    command: pytest /home/app/tests --disable-warnings -vrs
 
 
 volumes:
+  postgres_data_bronze:
   postgres_data_silver:
   postgres_data_gold:
   airflow_metadata:

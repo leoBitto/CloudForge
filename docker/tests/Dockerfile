@@ -1,26 +1,21 @@
-# Usa una base Python ufficiale
 FROM python:3.10-slim
 
-# Imposta la cartella di lavoro
 WORKDIR /home/app
 
-# Copia il requirements.txt nella cartella di lavoro
-COPY ./requirements.txt .
+# Copia tutti i file necessari
+COPY . .
 
-# Installa le dipendenze del progetto
+# Installa dipendenze
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia il codice sorgente per i test (a seconda della tua struttura)
-COPY ./src/ .
+# Imposta PYTHONPATH in modo esplicito
+ENV PYTHONPATH=/home/app/src/django:$PYTHONPATH
 
-# Copia la cartella dei test
-COPY ./tests/ ./tests/
-
-
-# Comandi di debug
+# Debug steps
 RUN pwd
 RUN ls -R ./tests
+RUN python -c "import sys; print('\n'.join(sys.path))"
 
-# Aggiungi un comando per eseguire i test (puoi personalizzarlo come vuoi)
-CMD ["pytest", "/home/app/tests", "--maxfail=5", "--disable-warnings", "--maxfail=1"]
+# Comandi di test
+CMD ["pytest", "/home/app/tests", "--disable-warnings", "-v"]
