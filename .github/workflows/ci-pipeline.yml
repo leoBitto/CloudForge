@@ -11,10 +11,6 @@ on:
 jobs:
     test:
       runs-on: ubuntu-latest
-      services:
-        - name: docker:19.03.12
-          image: docker:19.03.12
-          options: --privileged
       steps:
         - name: Checkout code
           uses: actions/checkout@v2
