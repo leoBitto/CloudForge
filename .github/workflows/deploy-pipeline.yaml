@@ -1,0 +1,17 @@
+name: Deploy Pipeline
+
+on:
+  repository_dispatch:
+    types: [trigger-deploy]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy application
+        run: |
+          # Comandi per il deploy dell'applicazione
+          echo "Deploying application..."
