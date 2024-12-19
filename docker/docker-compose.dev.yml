@@ -15,6 +15,8 @@ services:
     env_file:
       - ../config/django.conf
     depends_on:
+      postgres-bronze:
+        condition: service_healthy
       postgres-silver:
         condition: service_healthy
       postgres-gold:
@@ -116,7 +118,6 @@ services:
       - ../config/airflow.conf
     volumes:
       - ../src/airflow/dags:/opt/airflow/dags
-      #- ../src/airflow/logs:/opt/airflow/logs
       - ../src/airflow/plugins:/opt/airflow/plugins
       - /var/run/docker.sock:/var/run/docker.sock
     expose:
@@ -136,7 +137,6 @@ services:
       - ../config/airflow.conf
     volumes:
       - ../src/airflow/dags:/opt/airflow/dags
-      #- ../src/airflow/logs:/opt/airflow/logs
       - ../src/airflow/plugins:/opt/airflow/plugins
       - /var/run/docker.sock:/var/run/docker.sock
     command: bash -c "airflow scheduler"
@@ -154,7 +154,6 @@ services:
       - ../config/airflow.conf
     volumes:
       - ../src/airflow/dags:/opt/airflow/dags
-      #- ../src/airflow/logs:/opt/airflow/logs
       - ../src/airflow/plugins:/opt/airflow/plugins
       - /var/run/docker.sock:/var/run/docker.sock
     command: >
@@ -162,12 +161,12 @@ services:
                 airflow db init &&
                 airflow db migrate &&
                 airflow users create \\
-                 --username admin \\
-                 --password admin \\
-                 --firstname admin \\
-                 --lastname admin \\
+                 --username $$ADMIN_USERNAME \\
+                 --password $$ADMIN_PASSWORD \\
+                 --firstname $$ADMIN_FIRSTNAME \\
+                 --lastname $$ADMIN_LASTNAME \\
                  --role Admin \\
-                 --email admin@example.com"
+                 --email $$ADMIN_MAIL"
     depends_on:
       - airflow-db
     networks:
@@ -220,6 +219,6 @@ volumes:
 networks:
   app_network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.100.0/24
+    #ipam:
+    #  config:
+    #  - subnet: 192.168.100.0/24
