@@ -20,7 +20,7 @@ jobs:
 
       - name: Build and run tests
         run: |
-          docker-compose -f docker/docker-compose.dev.yml up test-runner
+          docker compose -f docker/docker-compose.dev.yml up test-runner
 
       - name: Trigger Upload Pipeline
         uses: peter-evans/repository-dispatch@v1
