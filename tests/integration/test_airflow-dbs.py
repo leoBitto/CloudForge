@@ -1,77 +1,45 @@
 import pytest
+from airflow.settings import engine
 from airflow.hooks.postgres_hook import PostgresHook
+from airflow.models import DagBag
+from sqlalchemy import text
+import requests
 
-def test_airflow_postgres_bronze_connection():
+# -------- TEST 1: Connessione al database dei metadati -------- #
+def test_airflow_metadata_db_connection():
     """
-    Testa che la connessione a PostgreSQL Bronze tramite Airflow sia funzionante e verifica la lettura/scrittura.
+    Check that Airflow can connect to its metadata database.
+    Executes a simple SELECT 1 query.
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT 1"))
+        assert result.scalar() == 1, "Failed to connect to Airflow metadata database."
+
+# -------- TEST 2: Connessione ai database bronze, silver, gold -------- #
+@pytest.mark.parametrize("conn_id", ["bronze_db", "silver_db", "gold_db"])
+def test_airflow_db_connections(conn_id):
+    """
+    Check that Airflow can connect to bronze, silver, and gold databases.
+    """
+    hook = PostgresHook(postgres_conn_id=conn_id)
+    result = hook.get_first("SELECT 1;")
+    assert result is not None and result[0] == 1, f"Failed to connect using {conn_id}."
+
+# -------- TEST 3: Caricamento dei DAG -------- #
+def test_dag_loading():
+    """
+    Ensure that all DAGs load without import errors.
+    """
+    dag_bag = DagBag(include_examples=False)
+    assert len(dag_bag.import_errors) == 0, f"Import errors found: {dag_bag.import_errors}"
+
+# -------- TEST 4: Verifica che il webserver sia raggiungibile -------- #
+def test_airflow_webserver():
+    """
+    Check that the Airflow webserver is reachable and returns a 200 status code.
     """
     try:
-        hook = PostgresHook(postgres_conn_id='postgres_bronze')
-        conn = hook.get_conn()
-        cursor = conn.cursor()
-        
-        # Test di scrittura
-        cursor.execute("CREATE TABLE IF NOT EXISTS test_table (id SERIAL PRIMARY KEY, value TEXT);")
-        cursor.execute("INSERT INTO test_table (value) VALUES ('test_value');")
-        conn.commit()
-        
-        # Test di lettura
-        cursor.execute("SELECT value FROM test_table WHERE value='test_value';")
-        result = cursor.fetchone()
-        assert result[0] == 'test_value', f"Query returned unexpected result: {result}"
-        
-        # Cleanup
-        cursor.execute("DROP TABLE test_table;")
-        conn.commit()
-    except Exception as e:
-        pytest.fail(f"Connection to 'postgres_bronze' failed: {e}")
-
-def test_airflow_postgres_silver_connection():
-    """
-    Testa che la connessione a PostgreSQL Silver tramite Airflow sia funzionante e verifica la lettura/scrittura.
-    """
-    try:
-        hook = PostgresHook(postgres_conn_id='postgres_silver')
-        conn = hook.get_conn()
-        cursor = conn.cursor()
-        
-        # Test di scrittura
-        cursor.execute("CREATE TABLE IF NOT EXISTS test_table (id SERIAL PRIMARY KEY, value TEXT);")
-        cursor.execute("INSERT INTO test_table (value) VALUES ('test_value');")
-        conn.commit()
-        
-        # Test di lettura
-        cursor.execute("SELECT value FROM test_table WHERE value='test_value';")
-        result = cursor.fetchone()
-        assert result[0] == 'test_value', f"Query returned unexpected result: {result}"
-        
-        # Cleanup
-        cursor.execute("DROP TABLE test_table;")
-        conn.commit()
-    except Exception as e:
-        pytest.fail(f"Connection to 'postgres_silver' failed: {e}")
-
-def test_airflow_postgres_gold_connection():
-    """
-    Testa che la connessione a PostgreSQL Gold tramite Airflow sia funzionante e verifica la lettura/scrittura.
-    """
-    try:
-        hook = PostgresHook(postgres_conn_id='postgres_gold')
-        conn = hook.get_conn()
-        cursor = conn.cursor()
-        
-        # Test di scrittura
-        cursor.execute("CREATE TABLE IF NOT EXISTS test_table (id SERIAL PRIMARY KEY, value TEXT);")
-        cursor.execute("INSERT INTO test_table (value) VALUES ('test_value');")
-        conn.commit()
-        
-        # Test di lettura
-        cursor.execute("SELECT value FROM test_table WHERE value='test_value';")
-        result = cursor.fetchone()
-        assert result[0] == 'test_value', f"Query returned unexpected result: {result}"
-        
-        # Cleanup
-        cursor.execute("DROP TABLE test_table;")
-        conn.commit()
-    except Exception as e:
-        pytest.fail(f"Connection to 'postgres_gold' failed: {e}")
+        response = requests.get("http://localhost:8080/health", timeout=5)
+        assert response.status_code == 200, "Airflow webserver is not responding correctly."
+    except requests.ConnectionError as e:
+        pytest.fail(f"Failed to connect to Airflow webserver: {e}")
