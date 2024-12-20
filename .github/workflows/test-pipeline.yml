@@ -1,29 +1,35 @@
-#name: Test Pipeline
-#
-#on:
-#  push:
-#    branches:
-#      - main
-#  pull_request:
-#    branches:
-#      - main
-#
-#jobs:
-#  test:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v2
-#
-#      - name: Set up Docker
-#        uses: docker/setup-buildx-action@v2
-#
-#      - name: Build and run tests
-#        run: |
-#          docker compose -f docker/docker-compose.dev.yml up test-runner
-#
-#      - name: Trigger Upload Pipeline
-#        uses: peter-evans/repository-dispatch@v1
-#        with:
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          event-type: trigger-upload
+name: CI - Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Compose
+        run: |
+          docker-compose -f docker/docker-compose.dev.yml up -d
+
+      - name: Run tests
+        run: |
+          docker-compose -f docker/docker-compose.dev.yml up test-runner
+
+      - name: Tear down
+        if: always()
+        run: |
+          docker-compose -f docker/docker-compose.dev.yml down
+
+      - name: Trigger Upload Pipeline
+        if: success() # Trigger solo se i test passano
+        uses: peter-evans/repository-dispatch@v1
+        with:
+             token: ${{ secrets.GITHUB_TOKEN }}
+             event-type: trigger-upload
