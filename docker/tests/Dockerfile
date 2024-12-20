@@ -7,7 +7,7 @@ COPY . .
 
 # Installa dipendenze
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements-test.txt
 
 # Imposta PYTHONPATH in modo esplicito
 ENV PYTHONPATH=/home/app/src/django:$PYTHONPATH

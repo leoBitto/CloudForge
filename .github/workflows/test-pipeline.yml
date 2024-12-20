@@ -27,9 +27,9 @@ jobs:
         run: |
           docker compose -f docker/docker-compose.dev.yml down
 
-      - name: Trigger Upload Pipeline
+      - name: Trigger Deploy Pipeline
         if: success() # Trigger solo se i test passano
         uses: peter-evans/repository-dispatch@v1
         with:
              token: ${{ secrets.GITHUB_TOKEN }}
-             event-type: trigger-upload
+             event-type: trigger-deploy
