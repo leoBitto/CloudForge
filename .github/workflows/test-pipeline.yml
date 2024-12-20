@@ -16,16 +16,16 @@ jobs:
 
       - name: Set up Docker Compose
         run: |
-          docker-compose -f docker/docker-compose.dev.yml up -d
+          docker compose -f docker/docker-compose.dev.yml up -d
 
       - name: Run tests
         run: |
-          docker-compose -f docker/docker-compose.dev.yml up test-runner
+          docker compose -f docker/docker-compose.dev.yml up test-runner
 
       - name: Tear down
         if: always()
         run: |
-          docker-compose -f docker/docker-compose.dev.yml down
+          docker compose -f docker/docker-compose.dev.yml down
 
       - name: Trigger Upload Pipeline
         if: success() # Trigger solo se i test passano
