@@ -1,4 +1,4 @@
-name: CI - Tests
+name: CI
 
 on:
   push:
@@ -20,7 +20,16 @@ jobs:
 
       - name: Run tests
         run: |
-          docker compose -f docker/docker-compose.dev.yml up test-runner
+            # Eseguo i test e catturo l'exit code
+            docker-compose -f docker/docker-compose.dev.yml up --exit-code-from test-runner test-runner
+            EXIT_CODE=$?
+        
+            # Stoppo i container (opzionale per pulizia)
+            docker-compose -f docker/docker-compose.dev.yml down
+        
+            # Termino il job con lo stesso exit code del container
+            exit $EXIT_CODE
+
 
       - name: Tear down
         if: always()

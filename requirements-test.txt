@@ -6,4 +6,8 @@ Pillow==10.1.0
 psycopg2-binary==2.9.9
 pytest==8.3.4
 pytest-django==4.9.0
-apache-airflow==2.2.3
+apache-airflow==2.10.3
+markupsafe==2.0.1
+Jinja2>=3.0.0
+requests
+sqlalchemy
