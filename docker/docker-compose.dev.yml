@@ -157,7 +157,7 @@ services:
       - ../src/airflow/plugins:/opt/airflow/plugins
       - /var/run/docker.sock:/var/run/docker.sock
     command: >
-      bash -c " env && 
+      bash -c "  
                 airflow db init &&
                 airflow db migrate &&
                 airflow users create \\
@@ -187,8 +187,8 @@ services:
     env_file:
       - ../config/gold.conf
       - ../config/streamlit.conf  
-    ports:
-      - "8501:8501"  
+    expose:
+      - 8501  
     restart: always
     command: streamlit run /app/app.py
     networks:
