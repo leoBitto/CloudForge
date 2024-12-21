@@ -36,3 +36,14 @@ jobs:
         run: |
           docker compose -f docker/docker-compose.dev.yml down
 
+  to_ghcr:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: upload image to ghcr
+        run: |
+            echo "uploading image to ghcr"
