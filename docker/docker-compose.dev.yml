@@ -157,8 +157,7 @@ services:
       - ../src/airflow/plugins:/opt/airflow/plugins
       - /var/run/docker.sock:/var/run/docker.sock
     command: >
-      bash -c "  
-                airflow db init &&
+      bash -c " airflow db init &&
                 airflow db migrate &&
                 airflow users create \\
                  --username $$ADMIN_USERNAME \\
@@ -225,6 +224,7 @@ services:
       - app_network
     env_file:
       - ../config/django.conf
+      - ../config/bronze.conf
       - ../config/silver.conf
       - ../config/gold.conf
     volumes:
