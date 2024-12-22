@@ -157,7 +157,7 @@ services:
       - ../src/airflow/plugins:/opt/airflow/plugins
       - /var/run/docker.sock:/var/run/docker.sock
     command: >
-      bash -c " env && 
+      bash -c "  
                 airflow db init &&
                 airflow db migrate &&
                 airflow users create \\
@@ -172,6 +172,29 @@ services:
     networks:
       - app_network
 
+
+  streamlit-app:
+    build:
+      context: ../
+      dockerfile: ./docker/streamlit/Dockerfile
+    volumes:
+      - ../src/streamlit:/app
+    depends_on:
+      postgres-gold:
+        condition: service_healthy
+      django-app:
+        condition: service_started
+    env_file:
+      - ../config/gold.conf
+      - ../config/streamlit.conf  
+    expose:
+      - 8501  
+    restart: always
+    command: streamlit run /app/app.py
+    networks:
+      - app_network
+
+
   # Nginx reverse proxy
   nginx-proxy:
     image: nginx:latest
@@ -185,6 +208,7 @@ services:
     depends_on:
       - django-app
       - airflow-webserver 
+      - streamlit-app
     networks:
       - app_network
 
@@ -219,6 +243,4 @@ volumes:
 networks:
   app_network:
     driver: bridge
-    #ipam:
-    #  config:
-    #  - subnet: 192.168.100.0/24
+
