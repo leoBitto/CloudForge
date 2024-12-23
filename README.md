@@ -8,7 +8,8 @@
 ![Python Version](https://img.shields.io/badge/python-3.10%2B-brightgreen)
 [![GitHub Issues](https://img.shields.io/github/issues/leoBitto/DataFoundry)](https://github.com/leoBitto/DataFoundry/issues)
 [![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-green)](https://github.com/leoBitto/DataFoundry)
-[![CI - Tests](https://github.com/leoBitto/repo/actions/workflows/tests-pipeline.yml/badge.svg)](https://github.com/leoBitto/repo/actions/workflows/tests-pipeline.yml)
+![Tests](https://github.com/leoBitto/DataFoundry/actions/workflows/tests-pipeline.yml/badge.svg)
+![Last Commit](https://img.shields.io/github/last-commit/leoBitto/DataFoundry)
 
 Welcome to **DataFoundry** 🚀, a flexible and scalable platform designed to orchestrate **data engineering workflows** for small and medium-sized enterprises (SMEs).  
 
