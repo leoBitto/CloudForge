@@ -1,0 +1,47 @@
+services:
+  postgres-bronze:
+    image: postgres:15
+    volumes:
+      - postgres_data_bronze:/var/lib/postgresql/data/
+    env_file:
+      - ../../src/django/config/databases/bronze.conf
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+
+  postgres-silver:
+    image: postgres:15
+    volumes:
+      - postgres_data_silver:/var/lib/postgresql/data/
+    env_file:
+      - ../../src/django/config/databases/silver.conf
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+
+  postgres-gold:
+    image: postgres:15
+    volumes:
+      - postgres_data_gold:/var/lib/postgresql/data/
+    env_file:
+      - ../../src/django/config/databases/gold.conf
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+
+volumes:
+  postgres_data_bronze:
+  postgres_data_silver:
+  postgres_data_gold:

@@ -212,24 +212,40 @@ services:
       - app_network
 
 
-  test-runner:
-    build:
-      context: ../
-      dockerfile: ./docker/tests/Dockerfile
-    image: test-runner
-    depends_on:
-      django-init:
-        condition: service_completed_successfully
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ../config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     networks:
       - app_network
-    env_file:
-      - ../config/django.conf
-      - ../config/bronze.conf
-      - ../config/silver.conf
-      - ../config/gold.conf
+
+
+  grafana:
+    image: grafana/grafana:latest
     volumes:
-      - ../tests:/home/app/tests 
-    command: pytest /home/app/tests --disable-warnings -vrs
+      - grafana_data:/var/lib/grafana
+      - ../config/grafana/datasource.json:/etc/grafana/provisioning/datasources/datasource.json
+      - ../config/grafana/grafana.ini:/etc/grafana/grafana.ini
+    env_file:
+      - ../config/grafana/grafana.ini
+    expose:
+      - "3000:3000"
+    restart: always
+    depends_on:
+      - prometheus
+    networks:
+      - app_network
+
+
 
 
 volumes:
@@ -239,6 +255,8 @@ volumes:
   airflow_metadata:
   static_volume:
   media_volume:
+  prometheus_data:
+  grafana_data:
 
 networks:
   app_network:

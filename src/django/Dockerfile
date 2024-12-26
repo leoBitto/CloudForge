@@ -19,9 +19,9 @@ RUN apt-get update && \
 RUN pip install --upgrade pip
 
 # install python dependencies
-COPY ./src/django/requirements.txt /usr/src/app/
+COPY requirements.txt /usr/src/app/
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
-COPY ./src/django/ /usr/src/app/
+COPY . /usr/src/app/
 
 #########
 # FINAL #
@@ -52,7 +52,7 @@ RUN pip install --no-cache /wheels/*
 
 
 # copy project
-COPY ./src/django/ $APP_HOME
+COPY . $APP_HOME
 
 # chown all the files to the app user
 RUN chown -R app:app $APP_HOME
