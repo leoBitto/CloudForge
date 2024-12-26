@@ -1,0 +1,45 @@
+services:
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ../config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - app_network
+
+
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ../config/grafana/datasource.json:/etc/grafana/provisioning/datasources/datasource.json
+      - ../config/grafana/grafana.ini:/etc/grafana/grafana.ini
+    env_file:
+      - ../config/grafana/grafana.ini
+    expose:
+      - "3000:3000"
+    restart: always
+    depends_on:
+      - prometheus
+    networks:
+      - app_network
+
+
+
+volumes:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  app_network:
+    driver: bridge
+
