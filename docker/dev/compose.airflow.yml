@@ -2,7 +2,7 @@ services:
   airflow-db:
     image: postgres:13
     env_file:
-      - ../config/airflow-db.conf
+      - ../../src/airflow/config/airflow-db.conf
     volumes:
       - airflow_metadata:/var/lib/postgresql/data
     healthcheck:
@@ -19,13 +19,16 @@ services:
     env_file:
       - ../../src/airflow/config/airflow-db.conf
       - ../../src/airflow/config/airflow.conf
+      - ../../src/django/config/django.conf
+    environment:
+      - AIRFLOW_CONN_POSTGRES_BRONZE= postgres://$${BRONZE_POSTGRES_USER}:$${BRONZE_POSTGRES_PASSWORD}@$${BRONZE_SQL_HOST}:$${BRONZE_SQL_PORT}/$${BRONZE_POSTGRES_DB}
+      - AIRFLOW_CONN_POSTGRES_SILVER= postgres://$${SILVER_POSTGRES_USER}:$${SILVER_POSTGRES_PASSWORD}@$${SILVER_SQL_HOST}:$${SILVER_SQL_PORT}/$${SILVER_POSTGRES_DB}
+      - AIRFLOW_CONN_POSTGRES_GOLD= postgres://$${GOLD_POSTGRES_USER}:$${GOLD_POSTGRES_PASSWORD}@$${GOLD_SQL_HOST}:$${GOLD_SQL_PORT}/$${GOLD_POSTGRES_DB}
     volumes:
       - ../../src/airflow/dags:/opt/airflow/dags
       - /var/run/docker.sock:/var/run/docker.sock
-    #expose:
-    #  - 8080
-    ports:
-      - "8080:8080"
+    expose:
+      - 8080
     command: bash -c  "airflow webserver"
     depends_on:
       - airflow-db
@@ -38,6 +41,11 @@ services:
     env_file:
       - ../../src/airflow/config/airflow-db.conf
       - ../../src/airflow/config/airflow.conf
+      - ../../src/django/config/django.conf
+    environment:
+      - AIRFLOW_CONN_POSTGRES_BRONZE= postgres://$${BRONZE_POSTGRES_USER}:$${BRONZE_POSTGRES_PASSWORD}@$${BRONZE_SQL_HOST}:$${BRONZE_SQL_PORT}/$${BRONZE_POSTGRES_DB}
+      - AIRFLOW_CONN_POSTGRES_SILVER= postgres://$${SILVER_POSTGRES_USER}:$${SILVER_POSTGRES_PASSWORD}@$${SILVER_SQL_HOST}:$${SILVER_SQL_PORT}/$${SILVER_POSTGRES_DB}
+      - AIRFLOW_CONN_POSTGRES_GOLD= postgres://$${GOLD_POSTGRES_USER}:$${GOLD_POSTGRES_PASSWORD}@$${GOLD_SQL_HOST}:$${GOLD_SQL_PORT}/$${GOLD_POSTGRES_DB}
     volumes:
       - ../../src/airflow/dags:/opt/airflow/dags
       - /var/run/docker.sock:/var/run/docker.sock
@@ -53,6 +61,11 @@ services:
     env_file:
       - ../../src/airflow/config/airflow-db.conf
       - ../../src/airflow/config/airflow.conf
+      - ../../src/django/config/django.conf
+    environment:
+      - AIRFLOW_CONN_POSTGRES_BRONZE= postgres://$${BRONZE_POSTGRES_USER}:$${BRONZE_POSTGRES_PASSWORD}@$${BRONZE_SQL_HOST}:$${BRONZE_SQL_PORT}/$${BRONZE_POSTGRES_DB}
+      - AIRFLOW_CONN_POSTGRES_SILVER= postgres://$${SILVER_POSTGRES_USER}:$${SILVER_POSTGRES_PASSWORD}@$${SILVER_SQL_HOST}:$${SILVER_SQL_PORT}/$${SILVER_POSTGRES_DB}
+      - AIRFLOW_CONN_POSTGRES_GOLD= postgres://$${GOLD_POSTGRES_USER}:$${GOLD_POSTGRES_PASSWORD}@$${GOLD_SQL_HOST}:$${GOLD_SQL_PORT}/$${GOLD_POSTGRES_DB}
     volumes:
       - ../../src/airflow/dags:/opt/airflow/dags
       - /var/run/docker.sock:/var/run/docker.sock
@@ -68,6 +81,9 @@ services:
                  --email $$ADMIN_MAIL"
     depends_on:
       - airflow-db
+      - postgres-bronze
+      - postgres-silver
+      - postgres-gold
     networks:
       - app_network
 

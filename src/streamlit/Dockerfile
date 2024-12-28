@@ -1,12 +1,11 @@
 FROM python:3.10-slim
 
-WORKDIR /app
+WORKDIR /src
 
-COPY ./src/streamlit/ /app/
+COPY . /src/
 
 RUN pip install --upgrade pip
-#COPY ./src/streamlit/requirements.txt /app
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN pip install --no-cache-dir -r /src/requirements.txt
 
 
 CMD ["streamlit", "run", "app.py"]

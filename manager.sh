@@ -5,17 +5,17 @@ COMPOSE_FILES="-f $COMPOSE_DIR/compose.base.yml"
 COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.databases.yml"
 COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.django.yml"
 COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.airflow.yml"
-#COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.streamlit.yml"
+COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.streamlit.yml"
 #COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.monitoring.yml"
-#COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.nginx.yml"
+COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.nginx.yml"
 
 case $1 in
     "up")
         # Se viene specificato un servizio, avvia solo quello
         if [ -n "$2" ]; then
-            docker compose $COMPOSE_FILES up --build --remove-orphans -d $2
+            docker compose $COMPOSE_FILES up --build --remove-orphans $2
         else
-            docker compose $COMPOSE_FILES up --build --remove-orphans -d
+            docker compose $COMPOSE_FILES up --build --remove-orphans 
         fi
         ;;
     "down")
