@@ -18,14 +18,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-
+from django.http import HttpResponse
+from authentication.views import LoginView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('', include('pwa.urls')),  # You MUST use an empty string as the URL prefix
-    path('api/', include('authentication.urls')),
-
+    path('', include('website.urls', namespace='website')),
+    path('auth/', include('authentication.urls', namespace='authentication')),
+    path('backoffice/', include('backoffice.urls', namespace='backoffice')),
 
 ]
 if settings.DEBUG:

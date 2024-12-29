@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'authentication',
     'rest_framework',
     'rest_framework_simplejwt',
-
+    'backoffice',
+    'website',
 ]
 
 MIDDLEWARE = [
@@ -141,6 +142,8 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),  # Durata del token accesso
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  # Durata del refresh token
 }
+# durata della sessione di django
+SESSION_COOKIE_AGE = 3600
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -164,10 +167,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
-#print(STATIC_ROOT, MEDIA_ROOT)
 
-LOGIN_URL = '/accounts/login/'
-#LOGIN_REDIRECT_URL = '/backoffice/'
+LOGIN_URL = '/auth/login/'
+LOGIN_REDIRECT_URL = '/backoffice/'
 LOGOUT_REDIRECT_URL = '/'
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 102400000000
