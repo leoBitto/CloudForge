@@ -12,20 +12,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from datetime import timedelta 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# # Carica configurazione da 'django.conf' in development
-# config_file = os.path.join(BASE_DIR.parent.parent, 'config', 'django.conf')
-
-# if os.path.exists(config_file):
-#     with open(config_file) as f:
-#         for line in f:
-#             line = line.strip()
-#             if line and not line.startswith("#"):  # Ignora righe vuote e commenti
-#                 key, value = line.split('=', 1)
-#                 os.environ[key.strip()] = value.strip()  # Rimuove spazi extra
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
@@ -50,7 +41,9 @@ INSTALLED_APPS = [
 
     'fontawesomefree',
     'pwa',
-
+    'authentication',
+    'rest_framework',
+    'rest_framework_simplejwt',
 
 ]
 
@@ -134,6 +127,20 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+SIMPLE_JWT = {
+    'SIGNING_KEY': os.environ.get("SECRET_KEY"),  # Cambia con una chiave segreta sicura
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),  # Durata del token accesso
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  # Durata del refresh token
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/

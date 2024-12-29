@@ -12,7 +12,5 @@ services:
       - django-app
       - airflow-webserver 
       - streamlit-app
-      #- prometheus
-      #- grafana
     networks:
       - app_network

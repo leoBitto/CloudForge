@@ -40,6 +40,7 @@ RUN addgroup --system app && adduser --system --group app
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
 RUN mkdir -p $APP_HOME
+RUN mkdir -p $APP_HOME/app/static $APP_HOME/app/media 
 WORKDIR $APP_HOME
 
 # install dependencies
@@ -52,7 +53,7 @@ RUN pip install --no-cache /wheels/*
 
 # copy project
 COPY . $APP_HOME
-#RUN mkdir $APP_HOME/static $APP_HOME/media 
+
 # chown all the files to the app user
 RUN chown -R app:app $APP_HOME
 

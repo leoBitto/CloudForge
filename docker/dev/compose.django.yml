@@ -53,7 +53,7 @@ services:
       python manage.py migrate --noinput --database=gold &&
       python manage.py collectstatic --noinput --clear &&
       python create_superuser.py 
-      #sleep 10000
+      sleep 10000
       "
 
 
