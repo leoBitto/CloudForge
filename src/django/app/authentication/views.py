@@ -1,11 +1,16 @@
 from django.contrib.auth.views import LoginView, LogoutView
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.shortcuts import redirect
 from rest_framework_simplejwt.tokens import AccessToken
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
+from django.http import JsonResponse
+from django.views import View
+from django.contrib.sessions.models import Session
+from django.contrib.auth import get_user_model
+from rest_framework import status
 
 # View per il login
 class LoginView(LoginView):
@@ -65,31 +70,64 @@ class LogoutView(LogoutView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class TokenStatusView(APIView):
-    permission_classes = [IsAuthenticated]
+class VerifySessionView(APIView):
+    permission_classes = [AllowAny]  # Aggiungi questa riga
     
+    def post(self, request, *args, **kwargs):
+        session_id = request.data.get('sessionid')
+        
+        if not session_id:
+            return Response(
+                {'error': 'Session ID non fornito'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            session = Session.objects.get(session_key=session_id)
+            session_data = session.get_decoded()
+            user_id = session_data.get('_auth_user_id')
+            
+            if not user_id:
+                return Response(
+                    {'error': 'Sessione non valida'}, 
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            
+            user = get_user_model().objects.get(id=user_id)
+            
+            return Response({
+                'valid': True,
+                'user': {
+                    'username': user.username,
+                    'groups': list(user.groups.values_list('name', flat=True))
+                }
+            })
+            
+        except Session.DoesNotExist:
+            return Response(
+                {'error': 'Sessione non trovata'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except get_user_model().DoesNotExist:
+            return Response(
+                {'error': 'Utente non trovato'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+class TokenStatusView(View):
     def get(self, request):
         token = request.session.get('token')
         if not token:
-            return Response({
+            return JsonResponse({
                 "status": "no_token",
                 "message": "No token in session"
             }, status=404)
-            
-        try:
-            # Decodifica il token per ottenere le informazioni
-            token_obj = AccessToken(token)
-            return Response({
-                "status": "valid",
-                "expires": token_obj.payload.get('exp'),
-                "user": token_obj.payload.get('user_id')
-            })
-        except Exception as e:
-            return Response({
-                "status": "invalid",
-                "message": str(e)
-            }, status=400)
-
+        
+        return JsonResponse({
+            "status": "valid",
+            "token": token
+        })
 
 # View protetta per test API
 class ProtectedView(APIView):

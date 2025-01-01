@@ -36,23 +36,22 @@
                     <div class="card-body text-center pt-4">
                         <i class="fas fa-tachometer-alt fa-2x mb-3"></i>
                         <h5 class="card-title">Dashboard</h5>
-                        <p class="card-text">Accedi alla dashboard.</p>
                         <form method="POST" action="/streamlit" target="_blank">
                             {% csrf_token %}
-                            <input type="hidden" name="token" value="{{ token }}">
+                            <input type="hidden" name="sessionid" value="{{ sessionid }}">
                             <button type="submit" class="btn btn-primary w-100">Accedi alla Dashboard</button>
                         </form>
                     </div>
                 </div>
             </div>
 
+            {% if 'Developer' in user_groups %}
             <!-- Card Airflow -->
             <div class="col-12 col-md-4 mb-3">
                 <div class="card p-3">
                     <div class="card-body text-center pt-4">
                         <i class="fas fa-fan fa-2x mb-3"></i>
                         <h5 class="card-title">Airflow</h5>
-                        <p class="card-text">Gestisci i flussi di lavoro.</p>
                         <form method="POST" action="/airflow" target="_blank">
                             {% csrf_token %}
                             <input type="hidden" name="token" value="{{ token }}">
@@ -61,11 +60,12 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white py-3 text-center mt-auto">
+    <footer class="bg-dark text-white py-3 text-center mt-auto d-flex justify-content-around">
         {% if 'Developer' in user_groups %}
             <a class="btn btn-link text-white text-decoration-none p-0" href="{% url 'admin:index' %}">Admin</a>
         {% endif %}

@@ -11,4 +11,6 @@ class BackofficeView(LoginRequiredMixin, TemplateView):
         context['user'] = user
         # Passiamo i gruppi a cui l'utente appartiene
         context['user_groups'] = user.groups.values_list('name', flat=True)
+        # Recupera il session ID
+        context['sessionid'] = self.request.session.session_key
         return context
