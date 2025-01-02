@@ -6,15 +6,41 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+env:
+  REGISTRY: ghcr.io
+  
 jobs:
-
-  to_ghcr:
+  build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: upload image to ghcr
-        run: |
-            echo "uploading image to ghcr"
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker images
+        run: source manage.sh build
+
+      - name: Verify Docker image creation
+        run: docker images
+
+      #- name: Tag and push images
+      #  run: |
+      #    # Tag each service
+      #    docker tag django-app:latest ${{ env.REGISTRY }}/${{ github.repository_owner }}/django-app:latest
+      #    docker tag streamlit-app:dev ${{ env.REGISTRY }}/${{ github.repository_owner }}/streamlit-app:latest
+      #    docker tag apache/airflow:2.10.3 ${{ env.REGISTRY }}/${{ github.repository_owner }}/airflow:latest
+      #    
+      #    # Push each service
+      #    docker push ${{ env.REGISTRY }}/${{ github.repository_owner }}/django-app:latest
+      #    docker push ${{ env.REGISTRY }}/${{ github.repository_owner }}/streamlit-app:latest
+      #    docker push ${{ env.REGISTRY }}/${{ github.repository_owner }}/airflow:latest
