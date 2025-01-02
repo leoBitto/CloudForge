@@ -15,7 +15,10 @@ services:
       - app_network
 
   airflow-webserver:
-    image: apache/airflow:2.10.3
+    build:
+      context: ../../src/airflow
+      dockerfile: Dockerfile
+    image: airflow-app:latest
     env_file:
       - ../../src/airflow/config/airflow-db.conf
       - ../../src/airflow/config/airflow.conf
@@ -37,7 +40,10 @@ services:
       - app_network
 
   airflow-scheduler:
-    image: apache/airflow:2.10.3
+    build:
+      context: ../../src/airflow
+      dockerfile: Dockerfile
+    image: airflow-app:latest
     env_file:
       - ../../src/airflow/config/airflow-db.conf
       - ../../src/airflow/config/airflow.conf
@@ -57,7 +63,10 @@ services:
       - app_network
 
   airflow-init:
-    image: apache/airflow:2.10.3
+    build:
+      context: ../../src/airflow
+      dockerfile: Dockerfile
+    image: airflow-app:latest
     env_file:
       - ../../src/airflow/config/airflow-db.conf
       - ../../src/airflow/config/airflow.conf
@@ -71,7 +80,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     command: >
       bash -c " airflow db init &&
-                airflow db migrate 
+                airflow db migrate &&
                 airflow users create \\
                  --username $$ADMIN_USERNAME \\
                  --password $$ADMIN_PASSWORD \\
