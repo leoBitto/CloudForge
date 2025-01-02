@@ -27,6 +27,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: verifiy repo
+        run: ls -la
+
       - name: Build Docker images
         run: source manage.sh build
 
