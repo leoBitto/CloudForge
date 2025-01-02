@@ -1,18 +1,18 @@
-# DataFoundry
+# CloudForge
 
 <p align="center">
-  <img src="docs/assets/img/DataFoundry.png" alt="DataFoundry" width="300"/>
+  <img src="docs/assets/img/CloudForge.png" alt="CloudForge" width="300"/>
 </p>
 
 [![License](https://img.shields.io/badge/license-GNU-blue)](LICENSE)
 ![Python Version](https://img.shields.io/badge/python-3.10%2B-brightgreen)
-[![GitHub Issues](https://img.shields.io/github/issues/leoBitto/DataFoundry)](https://github.com/leoBitto/DataFoundry/issues)
-[![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-green)](https://github.com/leoBitto/DataFoundry)
-[![CI - Tests](https://github.com/leoBitto/repo/actions/workflows/tests-pipeline.yml/badge.svg)](https://github.com/leoBitto/repo/actions/workflows/tests-pipeline.yml)
+[![GitHub Issues](https://img.shields.io/github/issues/leoBitto/CloudForge)](https://github.com/leoBitto/CloudForge/issues)
+[![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-green)](https://github.com/leoBitto/CloudForge)
+[![CI - Tests](https://github.com/leoBitto/repo/actions/workflows/CI.yml/badge.svg)](https://github.com/leoBitto/repo/actions/workflows/CI.yml)
 
-Welcome to **DataFoundry** 🚀, a flexible and scalable platform designed to orchestrate **data engineering workflows** for small and medium-sized enterprises (SMEs).  
+Welcome to **CloudForge** 🚀, a flexible and scalable platform designed to orchestrate **data engineering workflows** for small and medium-sized enterprises (SMEs).  
 
-DataFoundry seamlessly integrates tools for **data automation**, **monitoring**, and **business analytics**:  
+CloudForge seamlessly integrates tools for **data automation**, **monitoring**, and **business analytics**:  
 - **Django**: Build business-driven web applications with ease.  
 - **Streamlit**: Deliver interactive **visual insights** and data visualizations.  
 - **Airflow**: Automate and manage your data pipelines.  
@@ -36,12 +36,12 @@ Together, these tools provide an **end-to-end solution** for automating workflow
 
 ## Getting Started 🛠️
 
-Follow these steps to get DataFoundry up and running locally:
+Follow these steps to get CloudForge up and running locally:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/leoBitto/DataFoundry.git
-   cd DataFoundry
+   git clone https://github.com/leoBitto/CloudForge.git
+   cd CloudForge
    ```
 
 2. **Build and run the project** using the provided script:
@@ -63,7 +63,7 @@ Follow these steps to get DataFoundry up and running locally:
 ## Project Structure 📂
 
 ```plaintext
-DataFoundry/
+CloudForge/
 ├── config
 │   ├── airflow.conf
 │   ├── airflow-db.conf
@@ -79,7 +79,7 @@ DataFoundry/
 ├── docs
 │   ├── assets
 │   │   └── img
-│   │       └── DataFoundry.png
+│   │       └── CloudForge.png
 │   ├── base.md
 │   ├── _config.yml
 │   └── index.md
@@ -113,7 +113,7 @@ DataFoundry/
 
 ## Contributing 🤝
 
-Contributions are welcome! If you'd like to contribute to **DataFoundry**, please follow these steps:
+Contributions are welcome! If you'd like to contribute to **CloudForge**, please follow these steps:
 
 1. Fork the repository.
 2. Create a new branch (`git checkout -b feature-xyz`).
@@ -131,6 +131,6 @@ This project is licensed under the **GNU General Public License (GPL)**. See the
 
 ## Contact 📬
 
-For any questions, suggestions, or feedback, feel free to open an issue on [GitHub](https://github.com/leoBitto/DataFoundry/issues).
+For any questions, suggestions, or feedback, feel free to open an issue on [GitHub](https://github.com/leoBitto/CloudForge/issues).
 
 ---
