@@ -9,12 +9,6 @@ RUN apt-get update && \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copia la directory dei plugins
-COPY plugins/ /opt/airflow/plugins/
-
-# Copia le configurazioni
-COPY config/ /opt/airflow/config/
-
 USER airflow
 
 # Se hai bisogno di installare dipendenze Python specifiche per i plugins,
