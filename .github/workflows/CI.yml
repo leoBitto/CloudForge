@@ -43,12 +43,11 @@ jobs:
           docker tag django-app:latest ${{ env.REGISTRY }}/${REPO_NAME_LC,,}-django:latest
           docker tag streamlit-app:latest ${{ env.REGISTRY }}/${REPO_NAME_LC,,}-streamlit:latest
           docker tag airflow-app:latest ${{ env.REGISTRY }}/${REPO_NAME_LC,,}-airflow:latest
-
-      - name: Verify Docker image creation
-        run: docker images
           
+          # verify image creation
+          docker images
 
-      #    # Push each service
-      #    docker push ${{ env.REGISTRY }}/${REPO_NAME_LC,,}:/django-app:latest
-      #    docker push ${{ env.REGISTRY }}/${REPO_NAME_LC,,}:/streamlit-app:latest
-      #    docker push ${{ env.REGISTRY }}/${REPO_NAME_LC,,}:/airflow:latest
+          # Push each service
+          docker push ${{ env.REGISTRY }}/${REPO_NAME_LC,,}:/django-app:latest
+          docker push ${{ env.REGISTRY }}/${REPO_NAME_LC,,}:/streamlit-app:latest
+          docker push ${{ env.REGISTRY }}/${REPO_NAME_LC,,}:/airflow:latest
