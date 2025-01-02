@@ -3,7 +3,7 @@ services:
     build:
       context: ../../src/streamlit
       dockerfile: Dockerfile
-    image: streamlit-app:dev
+    image: streamlit-app:latest
     volumes:
       - ../../src/streamlit/app:/app
     env_file:
