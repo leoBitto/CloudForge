@@ -33,18 +33,22 @@ jobs:
       - name: Verify Docker image creation
         run: docker images
 
+      - name: Set lower case owner and repo names
+        run: |
+          echo "REPO_NAME_LC=${{ github.repository }}" >>${GITHUB_ENV}
+
       - name: Tag and push images
         run: |
           # Tag each service
-          docker tag django-app:latest ${{ env.REGISTRY }}/${{ github.repository_owner }}/django-app:latest
-          docker tag streamlit-app:latest ${{ env.REGISTRY }}/${{ github.repository_owner }}/streamlit-app:latest
-          docker tag apache-app:latest ${{ env.REGISTRY }}/${{ github.repository_owner }}/airflow-app:latest
+          docker tag django-app:latest ${{ env.REGISTRY }}/${REPO_NAME_LC,,}-django:latest
+          docker tag streamlit-app:latest ${{ env.REGISTRY }}/${REPO_NAME_LC,,}-streamlit:latest
+          docker tag apache-app:latest ${{ env.REGISTRY }}/${REPO_NAME_LC,,}-airflow:latest
 
       - name: Verify Docker image creation
         run: docker images
           
 
       #    # Push each service
-      #    docker push ${{ env.REGISTRY }}/${{ github.repository_owner }}/django-app:latest
-      #    docker push ${{ env.REGISTRY }}/${{ github.repository_owner }}/streamlit-app:latest
-      #    docker push ${{ env.REGISTRY }}/${{ github.repository_owner }}/airflow:latest
+      #    docker push ${{ env.REGISTRY }}/${REPO_NAME_LC,,}:/django-app:latest
+      #    docker push ${{ env.REGISTRY }}/${REPO_NAME_LC,,}:/streamlit-app:latest
+      #    docker push ${{ env.REGISTRY }}/${REPO_NAME_LC,,}:/airflow:latest
