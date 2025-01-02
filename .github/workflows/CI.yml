@@ -28,19 +28,30 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker images
-        run: source manage.sh build
+        run: source manager.sh build
 
       - name: Verify Docker image creation
         run: docker images
 
-      #- name: Tag and push images
-      #  run: |
-      #    # Tag each service
-      #    docker tag django-app:latest ${{ env.REGISTRY }}/${{ github.repository_owner }}/django-app:latest
-      #    docker tag streamlit-app:dev ${{ env.REGISTRY }}/${{ github.repository_owner }}/streamlit-app:latest
-      #    docker tag apache/airflow:2.10.3 ${{ env.REGISTRY }}/${{ github.repository_owner }}/airflow:latest
-      #    
-      #    # Push each service
-      #    docker push ${{ env.REGISTRY }}/${{ github.repository_owner }}/django-app:latest
-      #    docker push ${{ env.REGISTRY }}/${{ github.repository_owner }}/streamlit-app:latest
-      #    docker push ${{ env.REGISTRY }}/${{ github.repository_owner }}/airflow:latest
+      - name: Set lower case owner and repo names
+        run: |
+          echo "REPO_NAME_LC=${{ github.repository }}" >>${GITHUB_ENV}
+
+      - name: Tag and push images
+        run: |
+          # Tag each service
+          docker tag django-app:latest ${{ env.REGISTRY }}/${REPO_NAME_LC,,}-django:latest
+          docker tag streamlit-app:latest ${{ env.REGISTRY }}/${REPO_NAME_LC,,}-streamlit:latest
+          docker tag airflow-app:latest ${{ env.REGISTRY }}/${REPO_NAME_LC,,}-airflow:latest
+          
+      - name: Verify image creation
+        run: |
+          # verify image creation
+          docker images
+
+      - name: Push images to GHCR
+        run: |
+          # Push each service
+          docker push ${{ env.REGISTRY }}/${REPO_NAME_LC,,}-django:latest
+          docker push ${{ env.REGISTRY }}/${REPO_NAME_LC,,}-streamlit:latest
+          docker push ${{ env.REGISTRY }}/${REPO_NAME_LC,,}-airflow:latest
