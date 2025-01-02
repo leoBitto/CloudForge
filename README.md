@@ -8,7 +8,7 @@
 ![Python Version](https://img.shields.io/badge/python-3.10%2B-brightgreen)
 [![GitHub Issues](https://img.shields.io/github/issues/leoBitto/CloudForge)](https://github.com/leoBitto/CloudForge/issues)
 [![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-green)](https://github.com/leoBitto/CloudForge)
-[![CI - Tests](https://github.com/leoBitto/repo/actions/workflows/CI.yml/badge.svg)](https://github.com/leoBitto/repo/actions/workflows/CI.yml)
+[![CI - Tests](https://github.com/leoBitto/CloudForge/actions/workflows/CI.yml/badge.svg)](https://github.com/leoBitto/CloudForge/actions/workflows/CI.yml)
 
 Welcome to **CloudForge** 🚀, a flexible and scalable platform designed to orchestrate **data engineering workflows** for small and medium-sized enterprises (SMEs).  
 
@@ -16,8 +16,7 @@ CloudForge seamlessly integrates tools for **data automation**, **monitoring**, 
 - **Django**: Build business-driven web applications with ease.  
 - **Streamlit**: Deliver interactive **visual insights** and data visualizations.  
 - **Airflow**: Automate and manage your data pipelines.  
-- **PostgreSQL**: Separate data storage layers (**Gold** & **Silver**) for different quality of the data.  
-- **Grafana & Prometheus**: Monitor and alert on system health and performance.  
+- **PostgreSQL**: Separate data storage layers (**Gold** & **Silver** & **Bronze**) for different quality of the data.   
 
 Together, these tools provide an **end-to-end solution** for automating workflows, analyzing data, and supporting business decision-making.
 
@@ -28,8 +27,7 @@ Together, these tools provide an **end-to-end solution** for automating workflow
 - **Django**: Core framework for building dynamic and robust business applications.  
 - **Streamlit**: Visualize your data interactively with custom dashboards.  
 - **Airflow**: Automate workflows and orchestrate complex data pipelines.  
-- **PostgreSQL (Gold & Silver)**: Two instances to manage refined and aggregated data.  
-- **Grafana & Prometheus**: Monitor metrics and get real-time system insights.  
+- **PostgreSQL (Gold & Silver & Bronze)**: Three instances to manage raw, refined and aggregated data.   
 - **Nginx**: Proxy and route requests efficiently.  
 
 ---
@@ -54,9 +52,7 @@ Follow these steps to get CloudForge up and running locally:
      Username: `admin` | Password: `admin`
    - **Django Admin**: [http://localhost/admin](http://localhost/admin)  
      Username: `admin` | Password: `admin`
-   - **Streamlit**: [http://localhost:8501](http://localhost:8501)  
-   - **Grafana**: [http://localhost:3000](http://localhost:3000)  
-     Default Login: `admin` / `admin`
+   - **Streamlit**: [http://localhost/streamlit](http://localhost/streamlit)  
 
 ---
 
@@ -64,49 +60,94 @@ Follow these steps to get CloudForge up and running locally:
 
 ```plaintext
 CloudForge/
-├── config
-│   ├── airflow.conf
-│   ├── airflow-db.conf
-│   ├── django.conf
-│   ├── gold.conf
-│   └── silver.conf
 ├── docker
-│   ├── django
-│   │   └── Dockerfile
-│   ├── docker-compose.airflow.yml
-│   ├── docker-compose.dev.yml
-│   └── docker-compose.django.yml
-├── docs
-│   ├── assets
-│   │   └── img
-│   │       └── CloudForge.png
-│   ├── base.md
-│   ├── _config.yml
-│   └── index.md
+│   ├── dev
+│   │   ├── compose.airflow.yml
+│   │   ├── compose.base.yml
+│   │   ├── compose.databases.yml
+│   │   ├── compose.django.yml
+│   │   ├── compose.nginx.yml
+│   │   └── compose.streamlit.yml
+│   └── prod
 ├── LICENSE
 ├── manager.sh
-├── nginx
-│   ├── nginx.conf
-│   └── nginx.dev.conf
 ├── README.md
 └── src
     ├── airflow
-    │   ├── dags
-    │   │   └── test.py
-    │   ├── logs
-    │   │   └── scheduler
-    │   └── plugins
+    │   ├── config
+    │   │   ├── airflow.conf
+    │   │   └── airflow-db.conf
+    │   └── plugins
     ├── django
-    │   ├── base
-    │   │   ├── asgi.py
-    │   │   ├── __init__.py
-    │   │   ├── settings.py
-    │   │   ├── urls.py
-    │   │   └── wsgi.py
-    │   ├── create_superuser.py
-    │   ├── manage.py
-    │   └── requirements.txt
+    │   ├── app
+    │   │   ├── authentication
+    │   │   │   ├── admin.py
+    │   │   │   ├── apps.py
+    │   │   │   ├── __init__.py
+    │   │   │   ├── models.py
+    │   │   │   ├── signals.py
+    │   │   │   ├── templates
+    │   │   │   │   └── authentication
+    │   │   │   │       ├── login.html
+    │   │   │   │       └── logout.html
+    │   │   │   ├── tests.py
+    │   │   │   ├── urls.py
+    │   │   │   └── views.py
+    │   │   ├── backoffice
+    │   │   │   ├── admin.py
+    │   │   │   ├── apps.py
+    │   │   │   ├── __init__.py
+    │   │   │   ├── models.py
+    │   │   │   ├── templates
+    │   │   │   │   └── backoffice
+    │   │   │   │       └── backoffice.html
+    │   │   │   ├── tests.py
+    │   │   │   ├── urls.py
+    │   │   │   └── views.py
+    │   │   ├── base
+    │   │   │   ├── asgi.py
+    │   │   │   ├── __init__.py
+    │   │   │   ├── settings.py
+    │   │   │   ├── urls.py
+    │   │   │   └── wsgi.py
+    │   │   ├── create_superuser.py
+    │   │   ├── manage.py
+    │   │   └── website
+    │   │       ├── admin.py
+    │   │       ├── apps.py
+    │   │       ├── __init__.py
+    │   │       ├── migrations
+    │   │       │   └── __init__.py
+    │   │       ├── models.py
+    │   │       ├── templates
+    │   │       │   └── website
+    │   │       │       └── home.html
+    │   │       ├── tests.py
+    │   │       ├── urls.py
+    │   │       └── views.py
+    │   ├── config
+    │   │   ├── databases
+    │   │   │   ├── bronze.conf
+    │   │   │   ├── gold.conf
+    │   │   │   └── silver.conf
+    │   │   └── django.conf
+    │   ├── Dockerfile
+    │   └── requirements.txt
+    ├── nginx
+    │   └── config
+    │       └── nginx.dev.conf
     └── streamlit
+        ├── app
+        │   ├── app.py
+        │   ├── authentication.py
+        ├── config
+        │   ├── authorized_groups.yml
+        │   └── streamlit.conf
+        ├── Dockerfile
+        └── requirements.txt
+
+33 directories, 68 files
+
 ```
 
 ---
