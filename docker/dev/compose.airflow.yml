@@ -71,14 +71,15 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     command: >
       bash -c " airflow db init &&
-                airflow db migrate &&
+                airflow db migrate 
                 airflow users create \\
                  --username $$ADMIN_USERNAME \\
                  --password $$ADMIN_PASSWORD \\
                  --firstname $$ADMIN_FIRSTNAME \\
                  --lastname $$ADMIN_LASTNAME \\
                  --role Admin \\
-                 --email $$ADMIN_MAIL"
+                 --email $$ADMIN_MAIL
+                 "
     depends_on:
       - airflow-db
       - postgres-bronze
