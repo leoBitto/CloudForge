@@ -44,9 +44,13 @@ jobs:
           docker tag streamlit-app:latest ${{ env.REGISTRY }}/${REPO_NAME_LC,,}-streamlit:latest
           docker tag airflow-app:latest ${{ env.REGISTRY }}/${REPO_NAME_LC,,}-airflow:latest
           
+      - name: Verify image creation
+        run: |
           # verify image creation
           docker images
 
+      - name: Push images to GHCR
+        run: |
           # Push each service
           docker push ${{ env.REGISTRY }}/${REPO_NAME_LC,,}:/django-app:latest
           docker push ${{ env.REGISTRY }}/${REPO_NAME_LC,,}:/streamlit-app:latest
