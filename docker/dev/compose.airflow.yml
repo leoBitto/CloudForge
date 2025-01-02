@@ -1,0 +1,92 @@
+services:
+  airflow-db:
+    image: postgres:13
+    env_file:
+      - ../../src/airflow/config/airflow-db.conf
+    volumes:
+      - airflow_metadata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    restart: always
+    networks:
+      - app_network
+
+  airflow-webserver:
+    image: apache/airflow:2.10.3
+    env_file:
+      - ../../src/airflow/config/airflow-db.conf
+      - ../../src/airflow/config/airflow.conf
+      - ../../src/django/config/django.conf
+    environment:
+      - AIRFLOW_CONN_POSTGRES_BRONZE= postgres://$${BRONZE_POSTGRES_USER}:$${BRONZE_POSTGRES_PASSWORD}@$${BRONZE_SQL_HOST}:$${BRONZE_SQL_PORT}/$${BRONZE_POSTGRES_DB}
+      - AIRFLOW_CONN_POSTGRES_SILVER= postgres://$${SILVER_POSTGRES_USER}:$${SILVER_POSTGRES_PASSWORD}@$${SILVER_SQL_HOST}:$${SILVER_SQL_PORT}/$${SILVER_POSTGRES_DB}
+      - AIRFLOW_CONN_POSTGRES_GOLD= postgres://$${GOLD_POSTGRES_USER}:$${GOLD_POSTGRES_PASSWORD}@$${GOLD_SQL_HOST}:$${GOLD_SQL_PORT}/$${GOLD_POSTGRES_DB}
+    volumes:
+      - ../../src/airflow/dags:/opt/airflow/dags
+      - /var/run/docker.sock:/var/run/docker.sock
+    expose:
+      - 8080
+    command: bash -c  "airflow webserver"
+    depends_on:
+      - airflow-db
+    restart: always
+    networks:
+      - app_network
+
+  airflow-scheduler:
+    image: apache/airflow:2.10.3
+    env_file:
+      - ../../src/airflow/config/airflow-db.conf
+      - ../../src/airflow/config/airflow.conf
+      - ../../src/django/config/django.conf
+    environment:
+      - AIRFLOW_CONN_POSTGRES_BRONZE= postgres://$${BRONZE_POSTGRES_USER}:$${BRONZE_POSTGRES_PASSWORD}@$${BRONZE_SQL_HOST}:$${BRONZE_SQL_PORT}/$${BRONZE_POSTGRES_DB}
+      - AIRFLOW_CONN_POSTGRES_SILVER= postgres://$${SILVER_POSTGRES_USER}:$${SILVER_POSTGRES_PASSWORD}@$${SILVER_SQL_HOST}:$${SILVER_SQL_PORT}/$${SILVER_POSTGRES_DB}
+      - AIRFLOW_CONN_POSTGRES_GOLD= postgres://$${GOLD_POSTGRES_USER}:$${GOLD_POSTGRES_PASSWORD}@$${GOLD_SQL_HOST}:$${GOLD_SQL_PORT}/$${GOLD_POSTGRES_DB}
+    volumes:
+      - ../../src/airflow/dags:/opt/airflow/dags
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: bash -c "airflow scheduler"
+    depends_on:
+      - airflow-db
+    restart: always
+    networks:
+      - app_network
+
+  airflow-init:
+    image: apache/airflow:2.10.3
+    env_file:
+      - ../../src/airflow/config/airflow-db.conf
+      - ../../src/airflow/config/airflow.conf
+      - ../../src/django/config/django.conf
+    environment:
+      - AIRFLOW_CONN_POSTGRES_BRONZE= postgres://$${BRONZE_POSTGRES_USER}:$${BRONZE_POSTGRES_PASSWORD}@$${BRONZE_SQL_HOST}:$${BRONZE_SQL_PORT}/$${BRONZE_POSTGRES_DB}
+      - AIRFLOW_CONN_POSTGRES_SILVER= postgres://$${SILVER_POSTGRES_USER}:$${SILVER_POSTGRES_PASSWORD}@$${SILVER_SQL_HOST}:$${SILVER_SQL_PORT}/$${SILVER_POSTGRES_DB}
+      - AIRFLOW_CONN_POSTGRES_GOLD= postgres://$${GOLD_POSTGRES_USER}:$${GOLD_POSTGRES_PASSWORD}@$${GOLD_SQL_HOST}:$${GOLD_SQL_PORT}/$${GOLD_POSTGRES_DB}
+    volumes:
+      - ../../src/airflow/dags:/opt/airflow/dags
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: >
+      bash -c " airflow db init &&
+                airflow db migrate 
+                airflow users create \\
+                 --username $$ADMIN_USERNAME \\
+                 --password $$ADMIN_PASSWORD \\
+                 --firstname $$ADMIN_FIRSTNAME \\
+                 --lastname $$ADMIN_LASTNAME \\
+                 --role Admin \\
+                 --email $$ADMIN_MAIL
+                 "
+    depends_on:
+      - airflow-db
+      - postgres-bronze
+      - postgres-silver
+      - postgres-gold
+    networks:
+      - app_network
+
+volumes:
+  airflow_metadata:

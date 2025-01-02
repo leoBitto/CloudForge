@@ -1,4 +1,4 @@
-streamlit==1.31.0 
+streamlit==1.41.0 
 pandas==2.2.3
 polars==1.17.1
 psycopg2-binary==2.9.9

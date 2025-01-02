@@ -1,54 +1,48 @@
 #!/bin/bash
-COMPOSEFILE="./docker/docker-compose.dev.yml"
 
-# Questa funzione elimina le immagini precedenti e avvia i container
-build_and_start_containers() {
-    echo "Eliminazione dei container e volumi esistenti..."
-    sudo docker compose -f $COMPOSEFILE down -v --remove-orphans
+COMPOSE_DIR="docker/dev"
+COMPOSE_FILES="-f $COMPOSE_DIR/compose.base.yml"
+COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.databases.yml"
+COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.django.yml"
+COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.airflow.yml"
+COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.streamlit.yml"
+COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.nginx.yml"
 
-    echo "Creazione e avvio dei container Docker..."
-    sudo docker compose -f $COMPOSEFILE up --build || echo "Non è stato possibile costruire le immagini"
-    echo "Immagini create"
-
-}
-
-# Questa funzione avvia solo i container Docker
-start_containers() {
-    echo "Avvio dei container Docker in background..."
-    sudo docker compose -f $COMPOSEFILE up -d
-    echo "Container avviati"
-}
-
-# Questa funzione ferma i container Docker
-stop_containers() {
-    echo "Arresto di tutti i container Docker..."
-    sudo docker compose -f $COMPOSEFILE down
-    echo "Server fermato"
-}
-
-# Questa funzione elimina tutti i container e i volumi
-destroy_containers() {
-    echo "Eliminazione di tutti i container e volumi..."
-    sudo docker compose -f $COMPOSEFILE down -v --remove-orphans
-    echo "Container e volumi eliminati"
-}
-
-# Controlla gli argomenti passati allo script
-case "$1" in
-    build)
-        build_and_start_containers
+case $1 in
+    "up")
+        # Se viene specificato un servizio, avvia solo quello
+        if [ -n "$2" ]; then
+            docker compose $COMPOSE_FILES up --build --remove-orphans $2
+        else
+            docker compose $COMPOSE_FILES up --build --remove-orphans 
+        fi
         ;;
-    start)
-        start_containers
+    "down")
+        docker compose $COMPOSE_FILES down
         ;;
-    stop)
-        stop_containers
+    "build")
+        # Se viene specificato un servizio, rebuilda solo quello
+        if [ -n "$2" ]; then
+            docker compose $COMPOSE_FILES build $2
+        else
+            docker compose $COMPOSE_FILES build
+        fi
         ;;
-    destroy)
-        destroy_containers
+    "logs")
+        if [ -n "$2" ]; then
+            docker compose $COMPOSE_FILES logs -f $2
+        else
+            docker compose $COMPOSE_FILES logs -f
+        fi
         ;;
     *)
-        echo "Utilizzo: $0 {build|start|stop|destroy}"
+        echo "Usage: ./manager.sh [up|down|build|logs] [service_name]"
+        echo "Examples:"
+        echo "  ./manager.sh up              # avvia tutti i servizi"
+        echo "  ./manager.sh up django-app   # avvia solo django"
+        echo "  ./manager.sh build           # rebuilda tutti i servizi"
+        echo "  ./manager.sh build streamlit # rebuilda solo streamlit"
+        echo "  ./manager.sh logs django-app # mostra i log di django"
         exit 1
         ;;
 esac
