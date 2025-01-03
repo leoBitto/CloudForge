@@ -1,4 +1,4 @@
-# Jekyll configuration for Datafoundry documentation site
+# Jekyll configuration for CloudForge documentation site
 
 # Theme settings
 remote_theme: pages-themes/minimal@v0.2.0
@@ -9,12 +9,12 @@ plugins:
 
 
 # Site settings
-title: "DataFoundry Docs"
-description: "Official documentation for the DataFoundry project."
-logo: "/assets/img/DataFoundry.png"
+title: "CloudForge Docs"
+description: "Official documentation for the CloudForge project."
+logo: "/assets/img/CloudForge.png"
 show_downloads: true
 url: "https://leobitto.github.io"
-baseurl: "/DataFoundry" # Base URL for the project
+baseurl: "/CloudForge" # Base URL for the project
 
 # Exclude specific files or directories from being processed by Jekyll
 exclude:
@@ -33,7 +33,7 @@ highlighter: rouge
 # GitHub Pages settings
 github:
   is_project_page: true
-  project_tagline: "Datafoundry: Modular ecosystem for SMEs"
+  project_tagline: "CloudForge: Modular ecosystem for SMEs"
 
 # Collections
 collections:
