@@ -1,0 +1,5 @@
+apache-airflow
+polars
+delta-rs
+yfinance
+pandas

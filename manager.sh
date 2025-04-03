@@ -41,6 +41,5 @@ case $1 in
         echo "  ./manager.sh build           # rebuilda tutti i servizi"
         echo "  ./manager.sh build streamlit # rebuilda solo streamlit"
         echo "  ./manager.sh logs django-app # mostra i log di django"
-        exit 1
         ;;
 esac
