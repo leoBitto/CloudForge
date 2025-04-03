@@ -3,9 +3,7 @@
 COMPOSE_DIR="docker/dev"
 COMPOSE_FILES="-f $COMPOSE_DIR/compose.base.yml"
 COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.databases.yml"
-COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.django.yml"
 COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.airflow.yml"
-COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.streamlit.yml"
 COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.nginx.yml"
 
 case $1 in
