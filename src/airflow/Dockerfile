@@ -6,7 +6,7 @@ USER root
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     build-essential \
-    openjdk-11-jdk \
+    openjdk-17-jdk \
     curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -19,4 +19,5 @@ USER airflow
 
 # Copia il file requirements.txt ed installa i pacchetti Python
 COPY requirements.txt /opt/airflow/requirements.txt
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r /opt/airflow/requirements.txt
