@@ -11,6 +11,9 @@ ENV/
 *.venv
 .env.example
 
+# db e datas
+data/
+
 # Configurazione temporanea di Airflow
 # Ignora tutto tranne i DAG .py
 src/airflow/dags/*

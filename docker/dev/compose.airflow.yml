@@ -1,3 +1,20 @@
+x-airflow-common: &airflow-common
+  build:
+    context: ../../src/airflow
+    dockerfile: Dockerfile
+    args:
+      - HOST_UID=1000
+  image: airflow-app:latest
+  env_file:
+    - ../../src/airflow/config/.env
+    - ../../src/db/config/gold.conf  
+  volumes:
+    - ../../data:/opt/airflow/data
+    - ../../src/airflow/dags:/opt/airflow/dags
+    - /var/run/docker.sock:/var/run/docker.sock
+  networks:
+    - app_network
+
 services:
   airflow-db:
     image: postgres:13
@@ -10,92 +27,50 @@ services:
       interval: 10s
       retries: 5
       start_period: 5s
-    restart: always
     networks:
       - app_network
+
+  redis:
+    image: redis:7
+    container_name: redis
+
 
   airflow-webserver:
-    build:
-      context: ../../src/airflow
-      dockerfile: Dockerfile
-    image: airflow-app:latest
-    env_file:
-      - ../../src/airflow/config/airflow-db.conf
-      - ../../src/airflow/config/airflow.conf
-      - ../../src/django/config/django.conf
-    environment:
-      - AIRFLOW_CONN_POSTGRES_BRONZE= postgres://$${BRONZE_POSTGRES_USER}:$${BRONZE_POSTGRES_PASSWORD}@$${BRONZE_SQL_HOST}:$${BRONZE_SQL_PORT}/$${BRONZE_POSTGRES_DB}
-      - AIRFLOW_CONN_POSTGRES_SILVER= postgres://$${SILVER_POSTGRES_USER}:$${SILVER_POSTGRES_PASSWORD}@$${SILVER_SQL_HOST}:$${SILVER_SQL_PORT}/$${SILVER_POSTGRES_DB}
-      - AIRFLOW_CONN_POSTGRES_GOLD= postgres://$${GOLD_POSTGRES_USER}:$${GOLD_POSTGRES_PASSWORD}@$${GOLD_SQL_HOST}:$${GOLD_SQL_PORT}/$${GOLD_POSTGRES_DB}
-    volumes:
-      - ../../src/airflow/dags:/opt/airflow/dags
-      - /var/run/docker.sock:/var/run/docker.sock
+    <<: *airflow-common
+    command: bash -c "airflow webserver"
     expose:
       - 8080
-    command: bash -c  "airflow webserver"
     depends_on:
       - airflow-db
-    restart: always
-    networks:
-      - app_network
 
   airflow-scheduler:
-    build:
-      context: ../../src/airflow
-      dockerfile: Dockerfile
-    image: airflow-app:latest
-    env_file:
-      - ../../src/airflow/config/airflow-db.conf
-      - ../../src/airflow/config/airflow.conf
-      - ../../src/django/config/django.conf
-    environment:
-      - AIRFLOW_CONN_POSTGRES_BRONZE= postgres://$${BRONZE_POSTGRES_USER}:$${BRONZE_POSTGRES_PASSWORD}@$${BRONZE_SQL_HOST}:$${BRONZE_SQL_PORT}/$${BRONZE_POSTGRES_DB}
-      - AIRFLOW_CONN_POSTGRES_SILVER= postgres://$${SILVER_POSTGRES_USER}:$${SILVER_POSTGRES_PASSWORD}@$${SILVER_SQL_HOST}:$${SILVER_SQL_PORT}/$${SILVER_POSTGRES_DB}
-      - AIRFLOW_CONN_POSTGRES_GOLD= postgres://$${GOLD_POSTGRES_USER}:$${GOLD_POSTGRES_PASSWORD}@$${GOLD_SQL_HOST}:$${GOLD_SQL_PORT}/$${GOLD_POSTGRES_DB}
-    volumes:
-      - ../../src/airflow/dags:/opt/airflow/dags
-      - /var/run/docker.sock:/var/run/docker.sock
+    <<: *airflow-common
     command: bash -c "airflow scheduler"
     depends_on:
       - airflow-db
-    restart: always
-    networks:
-      - app_network
 
   airflow-init:
-    build:
-      context: ../../src/airflow
-      dockerfile: Dockerfile
-    image: airflow-app:latest
-    env_file:
-      - ../../src/airflow/config/airflow-db.conf
-      - ../../src/airflow/config/airflow.conf
-      - ../../src/django/config/django.conf
-    environment:
-      - AIRFLOW_CONN_POSTGRES_BRONZE= postgres://$${BRONZE_POSTGRES_USER}:$${BRONZE_POSTGRES_PASSWORD}@$${BRONZE_SQL_HOST}:$${BRONZE_SQL_PORT}/$${BRONZE_POSTGRES_DB}
-      - AIRFLOW_CONN_POSTGRES_SILVER= postgres://$${SILVER_POSTGRES_USER}:$${SILVER_POSTGRES_PASSWORD}@$${SILVER_SQL_HOST}:$${SILVER_SQL_PORT}/$${SILVER_POSTGRES_DB}
-      - AIRFLOW_CONN_POSTGRES_GOLD= postgres://$${GOLD_POSTGRES_USER}:$${GOLD_POSTGRES_PASSWORD}@$${GOLD_SQL_HOST}:$${GOLD_SQL_PORT}/$${GOLD_POSTGRES_DB}
-    volumes:
-      - ../../src/airflow/dags:/opt/airflow/dags
-      - /var/run/docker.sock:/var/run/docker.sock
+    <<: *airflow-common
     command: >
-      bash -c " airflow db init &&
-                airflow db migrate &&
-                airflow users create \\
-                 --username $$ADMIN_USERNAME \\
-                 --password $$ADMIN_PASSWORD \\
-                 --firstname $$ADMIN_FIRSTNAME \\
-                 --lastname $$ADMIN_LASTNAME \\
-                 --role Admin \\
-                 --email $$ADMIN_MAIL
-                 "
+      bash -c "
+        airflow db migrate &&
+        airflow connections create-default-connections &&
+        airflow connections add postgres_gold \\
+          --conn-uri \"postgres://\$POSTGRES_USER:\$POSTGRES_PASSWORD@\$GOLD_SQL_HOST:\$SQL_PORT/\$POSTGRES_DB\" &&
+        airflow users create \\
+          --username \$ADMIN_USERNAME \\
+          --password \$ADMIN_PASSWORD \\
+          --firstname \$ADMIN_FIRSTNAME \\
+          --lastname \$ADMIN_LASTNAME \\
+          --role Admin \\
+          --email \$ADMIN_MAIL"
+
     depends_on:
       - airflow-db
-      - postgres-bronze
-      - postgres-silver
       - postgres-gold
-    networks:
-      - app_network
 
 volumes:
   airflow_metadata:
+
+networks:
+  app_network:

@@ -3,14 +3,11 @@ services:
     image: nginx:latest
     volumes:
       - ../../src/nginx/config/nginx.dev.conf:/etc/nginx/nginx.conf:ro
-      - static_volume:/home/app/web/app/static
-      - media_volume:/home/app/web/app/media
     ports:
       - "80:80"
     restart: always
     depends_on:
-      - django-app
       - airflow-webserver 
-      - streamlit-app
+
     networks:
       - app_network
