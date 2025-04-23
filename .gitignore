@@ -17,7 +17,7 @@ data/
 # Configurazione temporanea di Airflow
 # Ignora tutto tranne i DAG .py
 src/airflow/dags/*
-!src/airflow/dags/*.py
+!src/airflow/dags/*/*.py
 
 # Log di Airflow
 src/airflow/logs/
