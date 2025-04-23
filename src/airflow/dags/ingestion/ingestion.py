@@ -5,6 +5,13 @@ import yfinance as yf
 import pandas as pd
 import os
 
+DATA_FOLDER = f'/opt/airflow/data/'
+MISC_FOLDER = DATA_FOLDER + f'misc/'
+INGESTION_FOLDER = DATA_FOLDER + f'ingestion/'
+
+ENRICHED_PATH = MISC_FOLDER + 'enriched_full.csv'
+
+
 # Configurazione dei parametri di default
 default_args = {
     'owner': 'airflow',
@@ -13,7 +20,7 @@ default_args = {
     'email_on_retry': False,
     'retries': 1,
     'retry_delay': timedelta(minutes=5),
-    'start_date': datetime(2025, 4, 23)
+    'start_date': datetime.now().strftime('%Y-%m-%d')
 }
 
 # Funzione per scaricare dati da Yahoo Finance
