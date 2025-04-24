@@ -29,7 +29,7 @@ def bronze_yfinance():
     @task()
     def read_tickers():
         df = pl.read_csv(ENRICHED_PATH)
-        return df['Ticker'].unique().to_list()
+        return df['Ticker'][:15].unique().to_list()
 
     @task()
     def download_to_delta(ticker: str):
