@@ -1,4 +1,5 @@
-FROM apache/airflow:2.10.3
+FROM apache/airflow:slim-2.10.3
+#FROM apache/airflow:slim-3.0.0
 
 USER root
 

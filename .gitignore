@@ -14,10 +14,15 @@ ENV/
 # db e datas
 data/
 
-# Configurazione temporanea di Airflow
 # Ignora tutto tranne i DAG .py
+# ignora tutto in dags/
 src/airflow/dags/*
-!src/airflow/dags/*.py
+
+# MA includi tutte le directory (altrimenti Git non ci entra)
+!src/airflow/dags/**/
+
+# e includi tutti i .py, anche annidati
+!src/airflow/dags/**/*.py
 
 # Log di Airflow
 src/airflow/logs/

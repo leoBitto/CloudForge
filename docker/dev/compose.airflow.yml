@@ -30,11 +30,6 @@ services:
     networks:
       - app_network
 
-  redis:
-    image: redis:7
-    container_name: redis
-
-
   airflow-webserver:
     <<: *airflow-common
     command: bash -c "airflow webserver"
