@@ -1,74 +1,80 @@
 #!/bin/bash
 
-CONFIG_DIR="src/airflow/config"
-MERGE_ENV_SCRIPT="$CONFIG_DIR/merge-airflow-env.sh"
-ENV_FILE="$CONFIG_DIR/.env"
-
+# Configurazione percorsi
 COMPOSE_DIR="docker/dev"
 COMPOSE_FILES="-f $COMPOSE_DIR/compose.base.yml"
 COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.databases.yml"
 COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.airflow.yml"
-COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.nginx.yml"
+# COMPOSE_FILES="$COMPOSE_FILES -f $COMPOSE_DIR/compose.nginx.yml" # Non usato ora
 
-# Funzione per generare il file .env
-generate_env() {
-    echo "🔧 Generazione file .env da config..."
-    bash "$MERGE_ENV_SCRIPT"
+# Percorsi locali da verificare/creare
+AIRFLOW_DIR="src/airflow"
+DIRECTORIES=("dags" "logs" "plugins")
 
-    if [ -f "$ENV_FILE" ]; then
-        echo "📤 Esportazione variabili da $ENV_FILE"
-        set -a
-        source "$ENV_FILE"
-        set +a
+# Funzione per preparare l'ambiente
+prepare_directories() {
+    echo "🔧 Verifica delle directory richieste..."
+    for dir in "${DIRECTORIES[@]}"; do
+        PATH_TO_CREATE="$AIRFLOW_DIR/$dir"
+        if [ ! -d "$PATH_TO_CREATE" ]; then
+            echo "➔ Creazione cartella mancante: $PATH_TO_CREATE"
+            mkdir -p "$PATH_TO_CREATE"
+            chmod 775 "$PATH_TO_CREATE"
+        fi
+    done
+}
+
+# Funzioni principali
+up() {
+    prepare_directories
+    echo "🚀 Avvio dei container..."
+    if [ -n "$1" ]; then
+        docker compose $COMPOSE_FILES up --build --remove-orphans "$1"
     else
-        echo "⚠️  File .env non trovato in $ENV_FILE"
+        docker compose $COMPOSE_FILES up --build --remove-orphans
     fi
 }
 
+down() {
+    echo "🛑 Arresto dei container e rimozione dei volumi..."
+    docker compose $COMPOSE_FILES down --volumes
+}
+
+build() {
+    prepare_directories
+    echo "🔨 Build dei container..."
+    if [ -n "$1" ]; then
+        docker compose $COMPOSE_FILES build "$1"
+    else
+        docker compose $COMPOSE_FILES build
+    fi
+}
+
+logs() {
+    echo "📜 Log in tempo reale..."
+    if [ -n "$1" ]; then
+        docker compose $COMPOSE_FILES logs -f "$1"
+    else
+        docker compose $COMPOSE_FILES logs -f
+    fi
+}
+
+# Comandi
 case $1 in
-    "env")
-        generate_env
-        ;;
-    "up")
-        generate_env
-        echo "🚀 Avvio dei container..."
-        if [ -n "$2" ]; then
-            docker compose $COMPOSE_FILES up --build --remove-orphans "$2"
-        else
-            docker compose $COMPOSE_FILES up --build --remove-orphans 
-        fi
-        ;;
-    "down")
-        echo "🛑 Arresto dei container e rimozione dei volumi..."
-        docker compose $COMPOSE_FILES down --volumes
-        ;;
-    "build")
-        echo "🔨 Build dei container..."
-        if [ -n "$2" ]; then
-            docker compose $COMPOSE_FILES build "$2"
-        else
-            docker compose $COMPOSE_FILES build
-        fi
-        ;;
-    "logs")
-        echo "📜 Log in tempo reale..."
-        if [ -n "$2" ]; then
-            docker compose $COMPOSE_FILES logs -f "$2"
-        else
-            docker compose $COMPOSE_FILES logs -f
-        fi
-        ;;
+    "up")        up "$2" ;;
+    "down")      down ;;
+    "build")     build "$2" ;;
+    "logs")      logs "$2" ;;
     *)
-        echo "Usage: ./manager.sh [env|up|down|build|logs] [service_name]"
+        echo "Usage: ./manager.sh [up|down|build|logs] [service_name]"
         echo ""
         echo "Comandi disponibili:"
-        echo "  env               # genera il file .env (senza avviare nulla)"
         echo "  up                # avvia tutti i container"
         echo "  up SERVICE        # avvia solo il container specificato"
         echo "  down              # ferma tutto e rimuove i volumi"
         echo "  build             # builda tutti i container"
         echo "  build SERVICE     # builda solo il container specificato"
         echo "  logs              # mostra i log di tutti i servizi"
-        echo "  logs SERVICE      # mostra i log di un servizio specifico"
+        echo "  logs SERVICE      # mostra i log di un servizio specificato"
         ;;
 esac

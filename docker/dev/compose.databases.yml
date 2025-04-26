@@ -1,6 +1,7 @@
 services:
   postgres-gold:
     image: postgres:15
+    container_name: cf-postgres-gold
     volumes:
       - postgres_data_gold:/var/lib/postgresql/data/
     env_file:

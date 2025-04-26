@@ -1,0 +1,100 @@
+x-airflow-common: &airflow-common
+  build:
+    context: ../../src/airflow
+    dockerfile: Dockerfile
+    args:
+      - HOST_UID=1000
+  image: airflow-app:latest
+  env_file:
+    - ../../src/airflow/config/.env
+    - ../../src/db/config/gold.conf
+  volumes:
+    - ../../data:/opt/airflow/data
+    - ../../src/airflow/dags:/opt/airflow/dags
+    - /var/run/docker.sock:/var/run/docker.sock
+  networks:
+    - app_network
+
+services:
+  airflow-db:
+    image: postgres:13
+    env_file:
+      - ../../src/airflow/config/airflow-db.conf
+    volumes:
+      - airflow_metadata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    networks:
+      - app_network
+
+  airflow-webserver:
+    <<: *airflow-common
+    command: bash -c "airflow api-server"
+    ports:
+      - "8080:8080"
+    depends_on:
+      airflow-db:
+        condition: service_healthy
+
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: bash -c "airflow scheduler"
+    depends_on:
+      airflow-db:
+        condition: service_healthy
+
+#  airflow-db-init:
+#    <<: *airflow-common
+#    command: bash -c "airflow db migrate"
+#    depends_on:
+#      airflow-db:
+#        condition: service_healthy
+#        
+#  airflow-user-init:
+#    image: curlimages/curl:latest
+#    depends_on:
+#      - airflow-webserver
+#    entrypoint: >
+#      sh -c "
+#        echo 'Creo utente admin...' &&
+#        curl -X POST 'http://airflow-webserver:8080/api/v1/users' \
+#          -H 'Content-Type: application/json' \
+#          -u admin:admin \
+#          -d '{
+#                \"username\": \"admin\",
+#                \"password\": \"admin\",
+#                \"email\": \"admin@localhost\",
+#                \"first_name\": \"Admin\",
+#                \"last_name\": \"User\",
+#                \"roles\": [\"Admin\"]
+#              }'
+#      "
+#    networks:
+#      - app_network
+#
+#  airflow-db-create-connection:
+#    <<: *airflow-common
+#    command: >
+#      bash -c "
+#        airflow db migrate &&
+#        airflow connections add postgres_gold \
+#          --conn-uri \"postgres://\$POSTGRES_USER:\$POSTGRES_PASSWORD@\$GOLD_SQL_HOST:\$SQL_PORT/\$POSTGRES_DB\" 
+#          "
+#    depends_on:
+#      airflow-db:
+#        condition: service_healthy
+#      postgres-gold:
+#        condition: service_started
+
+volumes:
+  airflow_metadata:
+
+networks:
+  app_network:
+
+
+
